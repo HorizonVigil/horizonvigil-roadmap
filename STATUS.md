@@ -43,7 +43,7 @@ supported-provider claim.
 | 00 | Architecture + capability registry | P0 | PARTIAL |
 | 01 | Multi-cloud connection model | P0 | PARTIAL |
 | 02 | Credentials + permissions | P0 | PARTIAL (AWS strong) |
-| 03 | Durable jobs | P0 | **PARTIAL — scheduled path bypasses it** |
+| 03 | Durable jobs | P0 | PARTIAL — AWS **PASS**, Azure/GCP not started |
 | 04 | AWS | P0 | PARTIAL |
 | 05 | Azure | P0 | PARTIAL |
 | 06 | GCP | P0 | PARTIAL |
