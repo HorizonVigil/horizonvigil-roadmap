@@ -2,6 +2,22 @@
 
 **P0 · PARTIAL — deployed, on the old contract**
 
+## Verified state (2026-09-15)
+
+| measure | value |
+|---|---|
+| connections | 2 |
+| connected | **1 of 2** |
+| live resources | **988** |
+| resource types observed | 13 of 30 collectors |
+| last successful sync | 2026-09-09 — **6 days stale** |
+
+The second connection (`production`) has been failing since **2026-08-28**
+(~18 days) with `Invalid JWT Signature` for service account
+`bookmyhostels@…` — an expired or rotated key, not a code defect.
+
+GCP is the only non-AWS provider with real runtime evidence.
+
 ## Done
 
 - connection, project scope, discovery, inventory rows

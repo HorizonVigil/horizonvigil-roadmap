@@ -9,12 +9,29 @@ Legend in [README.md](README.md#status-legend).
 
 ## Provider readiness
 
-| provider | connection | discovery | inventory | cost | security | compliance | certified |
+| provider | connections | connected | live resources | types observed | collectors built | last sync | certified |
 |---|---|---|---|---|---|---|---|
-| **AWS** | yes | yes | partial | **blocked** | partial | 0 evaluations | **no** |
-| **Azure** | yes | yes | old contract | no | no | no | **no** |
-| **GCP** | yes | yes | old contract | no | no | no | **no** |
-| **OCI** | — | — | — | — | — | — | **not implemented** |
+| **AWS** | 2 | **2** | **915** | 41 | 231 live | 2026-09-14 | no |
+| **GCP** | 2 | **1** | **988** | 13 | 30 live | 2026-09-09 | no |
+| **Azure** | 3 | **0** | **0** | **0** | 25 live | 2026-09-07 | no |
+| **OCI** | — | — | — | — | 0 | — | **not implemented** |
+
+**Azure has never successfully collected anything.** All three connections are
+in `error` with credential failures — an invalid client secret, a failed
+subscription listing, and a tenant id that is a literal placeholder
+(`11223344-5566-7788-99aa-bbccddeeff00`). Twenty-five collectors are built and
+marked live; **none has ever produced a row**.
+
+The Azure failures are credential and configuration problems, not proven code
+defects. But by this project's own evidence standard, unproven is not
+implemented — there is no runtime evidence for Azure at all.
+
+**GCP works on one connection of two.** The second (`production`) has been
+failing since 2026-08-28 with `Invalid JWT Signature`, roughly 18 days.
+
+**A "live" collector means enabled, not exercised.** AWS catalogs 249 types
+with 231 live scanners, but only **41** have produced a row against the
+connected accounts.
 
 OCI must ship **explicitly disabled** and must not appear in any
 supported-provider claim.
