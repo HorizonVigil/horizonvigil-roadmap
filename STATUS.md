@@ -113,14 +113,21 @@ A NO-GO list can read as if nothing works. These are all proven:
 | Azure (3 connections) and GCP (2 connections) have **0 collection_runs** — confirms the old-contract claim | expected |
 | Demo data lists **OCI** as a provider (`seed.ts`, `sourceInventory.ts`). Demo mode is off by default, opt-in, loudly banner-disclosed and never calls an API — but it still conflicts with "do not create fake OCI data" | minor |
 | Volume metrics had drifted 4 days; structural claims all held | none |
+| **Every AWS topology edge write was failing.** `networkTopology.ts` emitted `CONTAINED_BY` / `ATTACHED_TO` / `PROTECTED_BY`; the `cloud_resource_edges` CHECK permitted none. Each insert raised 23514, a shared best-effort `try/catch` caught it, and the run reported SUCCEEDED — so a 1,904-resource estate rendered as "no relationships". Second instance this session of a string only the database validates reaching production (after `collection_runs.trigger`). Fixed; the vocabulary is now a type. | **material** — [aws-10](V1/aws/aws-10-relationships/) |
+| **AWS-10 was documented as "verified against production data; persists at next finalize".** Two 1,628-step runs then finished SUCCEEDED with the count still at 3. "Verified" described a query that had been run, not an outcome the system reached. Corrected. | **material** |
+| **Two migrations existed only in the ledger, with no file** (`breakdown_rpc_exposes_canonical_type`, `aws11_inventory_reconciliations`) — the same `apply_migration` gap that previously orphaned 25 migrations. Reconstructed from the live schema; parity restored to **136 = 136**, zero differences in either direction. | moderate |
+| **`kamal-k8s` (604179600483) is READY for Cost Explorer.** AWS-13 was recorded as wholly BLOCKED; only `354307071074` is. | minor — corrected in [aws-13](V1/aws/aws-13-cost-primary-source/) |
 
 ## Standing engineering gaps
 
 - **A backup that has never been restored is a hypothesis.** The rehearsal has
   not been repeated since the job was deployed.
 - No PITR, no `auth.users`, no storage objects. RPO = 24h.
-- `cloud_resource_edges` holds **3 rows** — relationships are modelled, not
-  populated.
+- `cloud_resource_edges` held **3 rows** because **every topology write was
+  failing a CHECK constraint** and a best-effort `try/catch` swallowed it.
+  Root-caused and fixed 2026-09-15 (see [aws-10](V1/aws/aws-10-relationships/)).
+  178 edges are predicted from live data; **not yet observed** — a full run is
+  ~4h and one is in flight.
 - `provider_regions` holds 17 rows, all `opt_in_required = NULL`.
   `ec2:DescribeRegions` is not wired.
 - **0 compliance control evaluations.**
