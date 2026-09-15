@@ -13,7 +13,7 @@ The open item read:
 | measure | count |
 |---|---|
 | scanner modules on disk | 108 |
-| **registered scanners** | **104** — 88 regional · 13 global · 6 finding |
+| **registered scanners** | **104** distinct — 107 registry entries across 88 regional · 13 global · 6 finding, since `guardduty`, `securityhub` and `accessanalyzer` are each registered twice (regional collector **and** finding source) |
 | **resource types those scanners declare** | **231** |
 
 `231` counts the **resource types** the 104 scanners can emit, not the
@@ -88,7 +88,13 @@ That is state A, and it is the expected outcome for a small test estate.
 
 ## What remains genuinely open
 
-1. **15 of 104 scanners have not executed in the current runs.** The
+1. ~~**15 of 104 scanners have not executed in the current runs.**~~
+   **CLOSED 2026-09-15.** Run `9d132964` completed all 1,628 planned steps
+   and finished `SUCCEEDED`. Every registered scanner has now executed with a
+   success and **zero failures**: 88 regional, 13 global, 6 finding. The gap
+   was a sampling artifact of measuring mid-run, not absent coverage.
+
+2. **(was 1, continued)** The
    scheduled runs were at 1,320 of 1,628 steps at time of writing. Those
    scanners are in the remaining plan, not absent from it — but that is an
    inference from the plan, and it needs confirming once the runs finalize.

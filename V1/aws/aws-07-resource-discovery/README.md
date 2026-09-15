@@ -50,9 +50,24 @@ Lambda, no EKS — not because the scanners are defective.
 
 ## Missing
 
-- 15 of 104 scanners had not yet executed when the runs were sampled at
-  1,320/1,628 steps. They are in the remaining plan, not absent from it —
-  but that is inference from the plan and needs confirming at finalize
+- ~~15 of 104 scanners had not yet executed when the runs were sampled at
+  1,320/1,628 steps~~ — **confirmed at finalize 2026-09-15.** Run `9d132964`
+  completed all 1,628 planned steps, `SUCCEEDED`, and every registered
+  scanner has now executed with a success and **zero failures**:
+
+  | kind | registered | executed | failed |
+  |---|---|---|---|
+  | regional | 88 | **88** | 0 |
+  | global | 13 | **13** | 0 |
+  | finding | 6 | **6** | 0 |
+
+  The gap was a sampling artifact, exactly as inferred.
+
+  **On the "104 vs 88 + 13 + 6 = 107" discrepancy:** 104 is right. The three
+  registries hold 107 *entries* but only **104 distinct scanners** —
+  `guardduty`, `securityhub` and `accessanalyzer` are each registered twice,
+  once as a regional collector and once as a finding source. Verified against
+  the source registries, not inferred from the totals.
 - Zero-result state is **inferred**, not first-class: an account with no EKS
   and one whose EKS permission was denied both land in "succeeded, 0 records"
 - Coverage against a richer estate is untested — 11 producing scanners is a
