@@ -14,12 +14,12 @@ Measured 2026-09-15. Detail per provider: [aws](aws/) · [azure](azure/) ·
 | Authentication | PASS | FAILED | PARTIAL |
 | Credential lifecycle | **PASS** | NOT STARTED | NOT STARTED |
 | Permission validation | **PASS** | PARTIAL | PARTIAL |
-| Region / location | PARTIAL | NOT STARTED | NOT STARTED |
+| Region / location | **PASS** | NOT STARTED | NOT STARTED |
 | Durable collection | **PASS** | NOT STARTED | NOT STARTED |
 | Resource discovery | PARTIAL | **FAILED** | PARTIAL |
 | Canonical inventory | PARTIAL | NOT STARTED | NOT STARTED |
 | Resource generations | **PASS** | NOT STARTED | NOT STARTED |
-| Relationships | NOT STARTED | NOT STARTED | NOT STARTED |
+| Relationships | PARTIAL | NOT STARTED | NOT STARTED |
 | Lineage / reconciliation | PARTIAL | NOT STARTED | NOT STARTED |
 | Partial-scan safety | **PASS** | NOT STARTED | NOT STARTED |
 | Cost — primary source | **BLOCKED** | NOT STARTED | NOT STARTED |
@@ -42,7 +42,7 @@ Measured 2026-09-15. Detail per provider: [aws](aws/) · [azure](azure/) ·
 
 | | PASS | PARTIAL | NOT STARTED | FAILED / BLOCKED |
 |---|---|---|---|---|
-| AWS | **8** | 15 | 3 | 1 blocked |
+| AWS | **9** | 15 | 2 | 1 blocked |
 | GCP | 0 | 7 | 20 | — |
 | Azure | 0 | 4 | 21 | **2 failed** |
 

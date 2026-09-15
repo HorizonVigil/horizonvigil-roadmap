@@ -1,6 +1,6 @@
 # AWS-05 — Region / location discovery
 
-**Status: PARTIAL — substantially advanced, one modelling gap found**
+**Status: PASS**
 
 **Depends on:** AWS-00
 
@@ -26,7 +26,20 @@ POST /internal/refresh-region-catalog
 **The hardcoded roster was missing half of AWS.** 34 regions exist; the
 connector knew 17.
 
-## The gap this exposed
+## The gap, now closed
+
+`connection_region_opt_in` carries the per-account half; `provider_regions`
+keeps the provider half. Verified after the split — **both accounts' answers
+now coexist**:
+
+| connection | regions | available | not opted in | opt_in NULL |
+|---|---|---|---|---|
+| pavan-test1 | 34 | **18** | 16 | 0 |
+| kamal-k8s | 34 | **17** | 17 | 0 |
+
+No overwriting. The disagreement is preserved because it is real.
+
+## How the gap was found
 
 The two accounts returned **different answers** — 18 available versus 17.
 That is correct and expected: opt-in is an **account** fact, not a global one.
