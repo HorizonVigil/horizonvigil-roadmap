@@ -2,7 +2,7 @@
 
 **Overall: V1 is NO-GO.**
 
-Verified against production on **2026-09-11**. Every figure came from a live
+Verified against production on **2026-09-15** (cross-check). Every figure came from a live
 probe, a CI run, or a production query — not from a changelog.
 
 Legend in [README.md](README.md#status-legend).
@@ -26,7 +26,7 @@ supported-provider claim.
 | 00 | Architecture + capability registry | P0 | PARTIAL |
 | 01 | Multi-cloud connection model | P0 | PARTIAL |
 | 02 | Credentials + permissions | P0 | PARTIAL (AWS strong) |
-| 03 | Durable jobs | P0 | PARTIAL (AWS only) |
+| 03 | Durable jobs | P0 | **PARTIAL — scheduled path bypasses it** |
 | 04 | AWS | P0 | PARTIAL |
 | 05 | Azure | P0 | PARTIAL |
 | 06 | GCP | P0 | PARTIAL |
@@ -69,7 +69,7 @@ A NO-GO list can read as if nothing works. These are all proven:
 | V2 denial / remediation / purge | **403** pre-auth, all three providers |
 | Tenant + scope isolation | **45** isolation tests per push, asserting on bodies |
 | Audit hash chain | **10/10** tamper scenarios in CI |
-| Lineage + quarantine | 7,960 batches · 996 observations · **18 quarantined** |
+| Lineage + quarantine | **15,422** batches · **1,000** observations · **30 quarantined** |
 | Cost arithmetic | **7/7** invariants; exact `11202.5000001234` |
 | Resource generations | **proven in production** on a real reused native id |
 | Alias inflation | fixed — 922 rows → **418 assets** |
@@ -86,6 +86,15 @@ A NO-GO list can read as if nothing works. These are all proven:
 | 3 | **Rotate both database passwords** | exposed; production and integration share one |
 | 4 | **Enable MFA** | 0 verified factors / 11 users; 0 of 21 orgs require it |
 | 5 | **`GITLEAKS_LICENSE`** | secret scanning fails; blocks Phase 25 |
+
+## Cross-check findings (2026-09-15)
+
+| finding | severity |
+|---|---|
+| **The AWS scheduled scan path never creates a `collection_run`.** 4 run rows exist, newest 2026-09-10, while ingestion batches went 7,960 → 15,422. No lease, no checkpoint, no concurrency guard on the path that actually runs daily. | **material** — corrected in [phase-03](V1/phase-03-durable-jobs/) |
+| Azure (3 connections) and GCP (2 connections) have **0 collection_runs** — confirms the old-contract claim | expected |
+| Demo data lists **OCI** as a provider (`seed.ts`, `sourceInventory.ts`). Demo mode is off by default, opt-in, loudly banner-disclosed and never calls an API — but it still conflicts with "do not create fake OCI data" | minor |
+| Volume metrics had drifted 4 days; structural claims all held | none |
 
 ## Standing engineering gaps
 

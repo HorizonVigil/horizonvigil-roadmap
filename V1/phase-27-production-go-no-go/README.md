@@ -16,7 +16,8 @@
 | 2 | Cost produces a trustworthy number | **blocked** — Cost Explorer not enabled on one account |
 | 3 | Relationships exist | 3 edge rows |
 | 4 | Compliance has evaluations | **0** |
-| 5 | Azure / GCP on the durable contract | no |
+| 5 | Azure / GCP on the durable contract | no — **0 collection_runs** for either |
+| 5b | AWS **scheduled** path on the durable contract | **no** — bypasses `collection_runs` entirely |
 | 6 | OCI certified **or** explicitly disabled | not implemented; must ship disabled |
 | 7 | Observability and SLOs | not started |
 | 8 | Performance and scale tested | not started |
