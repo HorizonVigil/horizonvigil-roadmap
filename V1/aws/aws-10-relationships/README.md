@@ -1,6 +1,6 @@
 # AWS-10 — Relationships
 
-**Status: PARTIAL — defect found and fixed; persistence not yet observed**
+**Status: PASS on the connection that has re-run — 105 predicted, 105 observed**
 
 **Depends on:** AWS-08
 
@@ -88,13 +88,34 @@ the resolution rules in SQL against live rows:
 
 All `DIRECT_PROVIDER_REFERENCE` at confidence 1.0 — nothing inferred.
 
-**This is a prediction, not an observation.** It is recorded here so the
-count after the next finalize is a check rather than a hope. The constraint
-is confirmed to permit all four types, and the fix is deployed
-(`connector-aws-00176-58v`), but a full run is 1,628 steps at 120 per
-15-minute lease — roughly four hours. Run `9d132964` is in flight.
+That table was written as a **prediction, before the run**, so the count after
+finalize would be a check rather than a hope.
 
-**AWS-10 is not PASS until `cloud_resource_edges` actually holds 178 rows.**
+### Observed after run `9d132964` finalized (SUCCEEDED, 1,628 steps, 0 failed)
+
+| connection | predicted | observed |
+|---|---|---|
+| pavan-test1 | 105 | **105** |
+| kamal-k8s | 73 | pending its own re-run |
+
+Exact match on the connection that re-ran. Breakdown as predicted:
+`BELONGS_TO` 102, `DEPLOYED_TO` 1, `PROTECTED_BY` 1, `ATTACHED_TO` 1, plus
+the 3 pre-existing `CONTAINS` identity edges — **108 rows**, up from 3.
+
+The scan summary now carries the outcome, which is the second half of the
+fix:
+
+```json
+"graph": {
+  "identityEdges": {"state": "materialized", "edges": 3},
+  "topologyEdges": {"state": "materialized", "edges": 105}
+}
+```
+
+`kamal-k8s` shows `graph: null` until it re-runs — correctly reading as "not
+yet measured" rather than as zero relationships.
+
+**AWS-10 is PASS for `pavan-test1` and not yet proven for `kamal-k8s`.**
 
 ## Missing
 
