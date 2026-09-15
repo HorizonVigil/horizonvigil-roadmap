@@ -69,6 +69,46 @@ V1 is also **read-only**. HorizonVigil does not change a customer's cloud.
 | 26 | [End-to-end multi-cloud certification](phase-26-end-to-end-certification/) | P0 | NOT STARTED |
 | 27 | [Production GO / NO-GO](phase-27-production-go-no-go/) | P0 | **NO-GO** |
 
+## Multi-cloud coverage of the roadmap itself
+
+All four provider phases exist (04 AWS · 05 Azure · 06 GCP · 07 OCI). But the
+**cross-cutting** phases were written AWS-first, and that is a gap in the plan,
+not only in the implementation. Measured across the phase documents:
+
+| phase | AWS | Azure | GCP | OCI | gap |
+|---|:--:|:--:|:--:|:--:|---|
+| 08 Canonical inventory | ✓ | — | — | — | the *canonical multi-cloud* model is specified only for AWS |
+| 09 Multi-cloud cost | ✓ | — | — | — | named multi-cloud; describes only Cost Explorer and CUR |
+| 13 Ownership / IaC | ✓ | — | — | — | tag semantics differ per provider (labels, tags, freeform tags) |
+| 14 Health / evidence | ✓ | — | — | — | metric sources differ per provider |
+| 16 Cross-cloud optimization | — | — | — | — | **no provider content at all** |
+| 18 Reports / exports | — | — | — | — | no per-provider coverage statement |
+| 20 API hardening | ✓ | — | — | — | provider-neutral by nature, but unstated |
+| 25 Security certification | ✓ | ✓ | — | — | GCP absent |
+| 00 Provider contract | ✓ | ✓ | ✓ | — | OCI absent from the phase whose purpose is abstracting it |
+
+### The structural hole
+
+**There is no Multi-Cloud Normalization phase.** Nothing owns the mapping:
+
+```
+AWS EC2 · Azure VM · GCP Compute · OCI Compute   ->  COMPUTE_INSTANCE
+AWS S3  · Azure Blob · GCP Storage · OCI Object  ->  OBJECT_STORAGE
+AWS RDS · Azure SQL · GCP Cloud SQL · OCI DB     ->  MANAGED_DATABASE
+AWS VPC · Azure VNet · GCP VPC · OCI VCN         ->  VIRTUAL_NETWORK
+```
+
+That is why **phase 16 has no provider content**: cross-cloud comparison has
+nothing to compare on. Normalization is a prerequisite, not a later polish,
+and it is currently missing from the plan entirely.
+
+### Reality check against production
+
+Roadmap coverage is one thing; runtime evidence is another. See
+[STATUS.md](../STATUS.md) — Azure has **0 connected connections and 0
+resources**, so every Azure statement in this roadmap is a plan, not a
+description.
+
 ## Phase completion rule
 
 A phase is **not** complete because code exists. Each requires:
