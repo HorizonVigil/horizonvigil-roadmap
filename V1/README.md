@@ -31,6 +31,22 @@ simply no evidence either way. See [phase-05](phase-05-azure/).
 > abstraction and keep OCI disabled rather than exposing an incomplete
 > capability. No marketing, docs or supported-provider list may claim it.
 
+## Per-provider tracks
+
+Each mandatory provider has its own **28-phase track**, with status and
+evidence measured independently. The cross-cutting phases below describe the
+programme; these describe each cloud.
+
+| track | phases | PASS | evidence | decision |
+|---|---|---|---|---|
+| [**AWS**](aws/) | [AWS-00 … AWS-27](aws/) | **6** | 915 resources · 41 types · 2/2 connected | **NO-GO** |
+| [**GCP**](gcp/) | [GCP-00 … GCP-27](gcp/) | 0 | 988 resources · 13 types · 1/2 connected | **NO-GO** |
+| [**Azure**](azure/) | [AZURE-00 … AZURE-27](azure/) | 0 | **0 resources · 0/3 connected** | **NO-GO** |
+| **OCI** | [phase-07](phase-07-oci/) | — | none | **DISABLED / NOT CERTIFIED** |
+
+- **[CERTIFICATION-MATRIX.md](CERTIFICATION-MATRIX.md)** — provider × capability, every cell
+- **[PROVIDER-PARITY.md](PROVIDER-PARITY.md)** — the 11 foundation modules Azure and GCP lack
+
 ## The hard boundary
 
 V1 is posture, cost and inventory intelligence. It **must not expose** CVE
