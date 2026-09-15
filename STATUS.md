@@ -108,6 +108,7 @@ A NO-GO list can read as if nothing works. These are all proven:
 
 | finding | severity |
 |---|---|
+| **Azure and GCP have 0 of 11 V1 foundation modules.** No durable jobs, ingestion, admission, lineage, generations, cost facts, cost source state, billing ingestion, capability status, credential rotation or relationships. AWS has all eleven. See [PROVIDER-PARITY.md](V1/PROVIDER-PARITY.md) | **material** |
 | **The AWS scheduled scan path never creates a `collection_run`.** 4 run rows exist, newest 2026-09-10, while ingestion batches went 7,960 → 15,422. No lease, no checkpoint, no concurrency guard on the path that actually runs daily. | **material** — corrected in [phase-03](V1/phase-03-durable-jobs/) |
 | Azure (3 connections) and GCP (2 connections) have **0 collection_runs** — confirms the old-contract claim | expected |
 | Demo data lists **OCI** as a provider (`seed.ts`, `sourceInventory.ts`). Demo mode is off by default, opt-in, loudly banner-disclosed and never calls an API — but it still conflicts with "do not create fake OCI data" | minor |

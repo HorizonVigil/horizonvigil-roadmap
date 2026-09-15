@@ -35,9 +35,21 @@ collectors may well be correct. But there is **no runtime evidence for Azure
 whatsoever**, and by the standard this programme applies everywhere else,
 unproven is not implemented.
 
-**What Azure actually needs first is one working subscription**, not more
-code. Until a real credential collects a real resource, none of the 25
-collectors can be certified, and no Azure capability may be publicly claimed.
+**A working subscription is necessary but nowhere near sufficient** — see
+[PROVIDER-PARITY.md](../PROVIDER-PARITY.md).
+
+An earlier version of this file said Azure needed "one working subscription,
+not more code". That was wrong. Azure is missing **all eleven** foundation
+modules AWS gained during V1 hardening: durable jobs, ingestion, admission,
+lineage, generations, cost facts, cost source state, billing ingestion,
+capability status, credential rotation and relationships. With perfect
+credentials today, Azure would collect resources with no lineage, no
+quarantine, no generations (so a reused id merges two histories), no cost
+facts and no capability status.
+
+Get the credential first — it unblocks every subsequent test — but the code
+gap is roughly 2,400 lines of foundation per provider plus provider-specific
+adaptation.
 
 ## Built
 

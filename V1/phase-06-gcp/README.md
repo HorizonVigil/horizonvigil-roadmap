@@ -18,6 +18,12 @@ The second connection (`production`) has been failing since **2026-08-28**
 
 GCP is the only non-AWS provider with real runtime evidence.
 
+But like Azure, GCP has **none of the eleven V1 foundation modules** — no
+durable jobs, ingestion, admission, lineage, generations, cost facts,
+capability status, credential rotation or relationships. Its 988 resources
+carry no lineage and no generation. See
+[PROVIDER-PARITY.md](../PROVIDER-PARITY.md).
+
 ## Done
 
 - connection, project scope, discovery, inventory rows
