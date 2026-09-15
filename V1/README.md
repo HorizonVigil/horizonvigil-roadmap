@@ -16,12 +16,16 @@ model. **Not** four parallel product implementations.
 
 ## Providers
 
-| provider | priority | state |
-|---|---|---|
-| AWS | P0 | deepest; durable jobs, lineage, generations |
-| Azure | P0 | deployed, still on the old stepped contract |
-| GCP | P0 | deployed, still on the old stepped contract |
-| OCI | P1 | **not implemented — must ship explicitly disabled** |
+| provider | priority | runtime evidence | state |
+|---|---|---|---|
+| AWS | P0 | **915 resources, 41 types, 2/2 connected** | deepest; durable jobs, lineage, generations |
+| GCP | P0 | **988 resources, 13 types, 1/2 connected** | old stepped contract; data 6 days stale |
+| Azure | P0 | **none — 0 resources, 0/3 connected** | 25 collectors built, none ever exercised |
+| OCI | P1 | none | **not implemented — must ship explicitly disabled** |
+
+Azure's three connections are all in `error` on credential failures, including
+a tenant id that is a literal placeholder. The code may be correct; there is
+simply no evidence either way. See [phase-05](phase-05-azure/).
 
 > If OCI cannot be production-certified within the V1 window, implement the
 > abstraction and keep OCI disabled rather than exposing an incomplete
