@@ -25,7 +25,7 @@ model. **Not** four parallel product implementations.
 
 Azure's three connections are all in `error` on credential failures, including
 a tenant id that is a literal placeholder. The code may be correct; there is
-simply no evidence either way. See [phase-05](phase-05-azure/).
+simply no evidence either way. See [the Azure track](azure/).
 
 > If OCI cannot be production-certified within the V1 window, implement the
 > abstraction and keep OCI disabled rather than exposing an incomplete
@@ -42,7 +42,7 @@ programme; these describe each cloud.
 | [**AWS**](aws/) | [AWS-00 … AWS-27](aws/) | **6** | 915 resources · 41 types · 2/2 connected | **NO-GO** |
 | [**GCP**](gcp/) | [GCP-00 … GCP-27](gcp/) | 0 | 988 resources · 13 types · 1/2 connected | **NO-GO** |
 | [**Azure**](azure/) | [AZURE-00 … AZURE-27](azure/) | 0 | **0 resources · 0/3 connected** | **NO-GO** |
-| **OCI** | [phase-07](phase-07-oci/) | — | none | **DISABLED / NOT CERTIFIED** |
+| **OCI** | [oci](oci/) | — | none | **DISABLED / NOT CERTIFIED** |
 
 - **[CERTIFICATION-MATRIX.md](CERTIFICATION-MATRIX.md)** — provider × capability, every cell
 - **[PROVIDER-PARITY.md](PROVIDER-PARITY.md)** — the 11 foundation modules Azure and GCP lack
@@ -56,7 +56,10 @@ workflows, SAST, DAST, or repository/runtime vulnerability scanning. Those are
 
 V1 is also **read-only**. HorizonVigil does not change a customer's cloud.
 
-## The 27 phases
+## Cross-cutting phases
+
+These describe programme-level concerns that span every provider. Anything
+provider-specific lives in the provider tracks above, not here.
 
 | # | phase | P | state |
 |---|---|---|---|
@@ -64,10 +67,7 @@ V1 is also **read-only**. HorizonVigil does not change a customer's cloud.
 | 01 | [Multi-cloud connection model](phase-01-multi-cloud-connection-model/) | P0 | PARTIAL |
 | 02 | [Credentials + permission validation](phase-02-credentials-and-permissions/) | P0 | PARTIAL |
 | 03 | [Durable jobs / workers](phase-03-durable-jobs/) | P0 | PARTIAL |
-| 04 | [AWS](phase-04-aws/) | P0 | PARTIAL |
-| 05 | [Azure](phase-05-azure/) | P0 | PARTIAL |
-| 06 | [GCP](phase-06-gcp/) | P0 | PARTIAL |
-| 07 | [OCI](phase-07-oci/) | P1 | NOT STARTED |
+| 04–07 | **Providers** — see the per-provider tracks above | P0 | [aws](aws/) · [azure](azure/) · [gcp](gcp/) · [oci](oci/) |
 | 08 | [Canonical inventory](phase-08-canonical-inventory/) | P0 | PARTIAL |
 | 09 | [Multi-cloud cost engine](phase-09-multi-cloud-cost/) | P0 | BLOCKED |
 | 10 | [Security posture](phase-10-security-posture/) | P0 | PARTIAL |

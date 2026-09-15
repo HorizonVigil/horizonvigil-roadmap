@@ -56,7 +56,7 @@ certification    = NOT_CERTIFIED
 Every capability is `DISABLED`. No connector, schema, credential handling or
 UI exists. OCI must not appear in any supported-provider claim, marketing
 page, pricing page or documentation until it passes certification
-independently. See [phase-07-oci](phase-07-oci/).
+independently. See [oci](oci/).
 
 ## What the matrix says
 

@@ -6,7 +6,7 @@
 
 - **Read-only collection role.** All 177 advertised AWS actions audited; eight
   were credential-producing or over-broad and were removed or narrowed. See
-  [Phase 04](../phase-04-aws/).
+  [the AWS track](../aws/).
 - **Tenant isolation** proven against a real database — 45 isolation tests on
   every push, asserting on response **bodies**, not just status codes.
 - **Deny by default** for resource grants; scope isolation server-side.
