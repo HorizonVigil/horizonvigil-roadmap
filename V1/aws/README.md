@@ -7,17 +7,17 @@
 | measure | value |
 |---|---|
 | connections | 2 of 2 **connected** |
-| live resources | **915** |
+| live resources | **1,905** |
 | resource types observed | **41** of 231 live scanners |
-| last sync | 2026-09-14 |
+| last sync | 2026-09-15 |
 | foundation modules | **11 of 11** |
 
 ## The shape of the gap
 
 AWS has the foundation; what it lacks is breadth and proof. Cost is blocked on
-an account-owner action, relationships are modelled but empty, compliance has
-zero evaluations, and the scheduled collection path still bypasses the durable
-job machinery.
+an account-owner action, relationships now materialize but remain incomplete,
+compliance has zero evaluations, and the scheduled collection path still
+bypasses the durable job machinery.
 
 ## Phases
 
@@ -33,7 +33,7 @@ job machinery.
 | AWS-07 | [Resource discovery](aws-07-resource-discovery/) | PARTIAL |
 | AWS-08 | [Canonical inventory](aws-08-canonical-inventory/) | PARTIAL |
 | AWS-09 | [Resource generations](aws-09-resource-generations/) | PASS |
-| AWS-10 | [Relationships](aws-10-relationships/) | NOT STARTED |
+| AWS-10 | [Relationships](aws-10-relationships/) | PARTIAL — **181 edges materialized** |
 | AWS-11 | [Lineage and reconciliation](aws-11-lineage-and-reconciliation/) | PARTIAL |
 | AWS-12 | [Partial collection safety](aws-12-partial-collection-safety/) | PARTIAL |
 | AWS-13 | [Cost — primary source](aws-13-cost-primary-source/) | **BLOCKED** |

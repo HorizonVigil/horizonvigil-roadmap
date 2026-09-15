@@ -42,9 +42,9 @@ Measured 2026-09-15. Detail per provider: [aws](aws/) · [azure](azure/) ·
 
 | | PASS | PARTIAL | NOT STARTED | FAILED / BLOCKED |
 |---|---|---|---|---|
-| AWS | **9** | 15 | 2 | 1 blocked |
-| GCP | 0 | 7 | 20 | — |
-| Azure | 0 | 4 | 21 | **2 failed** |
+| AWS | **10** | 13 | 2 | 1 blocked |
+| GCP | 0 | 6 | 20 | — |
+| Azure | 0 | 3 | 20 | **3 failed** |
 
 ## OCI
 
@@ -60,23 +60,25 @@ independently. See [oci](oci/).
 
 ## What the matrix says
 
-**AWS carries the programme.** Six PASS cells, all with production runtime
+**AWS carries the programme.** Ten PASS cells, all with production runtime
 evidence — credential lifecycle, generations, recommendations and changes
 among them. Its single BLOCKED cell is an account-owner action, not
 engineering.
 
-**Azure has two FAILED cells, which is worse than NOT STARTED.** Connection
-and discovery have been *attempted in production and do not work*. Everything
-downstream is unverifiable until a working credential exists.
+**Azure has three FAILED cells, which is worse than NOT STARTED.** Connection,
+authentication, and discovery have been *attempted in production and do not
+work*. Everything downstream is unverifiable until a working credential
+exists.
 
 **GCP is the only non-AWS provider producing real data** — 988 resources — but
 those rows carry no lineage, no fingerprint and no generation, because they
 were written by the pre-Phase-2 path.
 
-**The row that matters most is Relationships: NOT STARTED for all three.**
-`cloud_resource_edges` holds 3 rows fleet-wide. Cross-cloud optimization,
-attack-path reasoning and Resource 360 all depend on a graph that does not
-exist for any provider.
+**Relationships are PARTIAL for AWS and NOT STARTED for Azure and GCP.** AWS
+now has 181 materialized edges, proving the write path; its graph is still too
+narrow and lacks generation-aware edges. Cross-cloud optimization,
+attack-path reasoning and Resource 360 remain unavailable until all mandatory
+providers have certified relationship coverage.
 
 ## The dependency that dominates everything
 

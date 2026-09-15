@@ -1,6 +1,6 @@
 # AWS-10 — Relationships
 
-**Status: PASS on the connection that has re-run — 105 predicted, 105 observed**
+**Status: PARTIAL — materialization is verified across the connected estate (181 edges), but relationship coverage is incomplete**
 
 **Depends on:** AWS-08
 
@@ -115,7 +115,11 @@ fix:
 `kamal-k8s` shows `graph: null` until it re-runs — correctly reading as "not
 yet measured" rather than as zero relationships.
 
-**AWS-10 is PASS for `pavan-test1` and not yet proven for `kamal-k8s`.**
+The repaired deployment now records **181 edges**: 3 identity edges plus the
+178 topology edges predicted for the two connected accounts. This proves the
+write path is operating across the connected estate. The phase remains
+**PARTIAL**, not PASS, because the relationship set is still narrow and lacks
+generation-aware edges and a complete confidence vocabulary.
 
 ## Missing
 

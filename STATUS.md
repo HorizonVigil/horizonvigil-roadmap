@@ -11,7 +11,7 @@ Legend in [README.md](README.md#status-legend).
 
 | provider | connections | connected | live resources | types observed | collectors built | last sync | certified |
 |---|---|---|---|---|---|---|---|
-| **AWS** | 2 | **2** | **915** | 41 | 231 live | 2026-09-14 | no |
+| **AWS** | 2 | **2** | **1,905** | 41 | 231 live | 2026-09-15 | no |
 | **GCP** | 2 | **1** | **988** | 13 | 30 live | 2026-09-09 | no |
 | **Azure** | 3 | **0** | **0** | **0** | 25 live | 2026-09-07 | no |
 | **OCI** | — | — | — | — | 0 | — | **not implemented** |
@@ -125,10 +125,11 @@ A NO-GO list can read as if nothing works. These are all proven:
 - No PITR, no `auth.users`, no storage objects. RPO = 24h.
 - ~~`cloud_resource_edges` holds 3 rows~~ — **FIXED and verified 2026-09-15.**
   Every topology write had been failing a CHECK constraint while a
-  best-effort `try/catch` swallowed it. After the fix, run `9d132964`
-  finalized and `pavan-test1` materialized **exactly the 105 edges predicted**
-  from live data (108 rows total, up from 3). `kamal-k8s`'s 73 pending its own
-  re-run. See [aws-10](V1/aws/aws-10-relationships/).
+  best-effort `try/catch` swallowed it. The repaired deployment now records
+  **181 edges**: the 3 identity edges plus the 178 topology edges predicted
+  from the two connected accounts. Relationship materialization is real; its
+  breadth, generation binding, and confidence vocabulary remain incomplete.
+  See [aws-10](V1/aws/aws-10-relationships/).
 - `provider_regions` holds 17 rows, all `opt_in_required = NULL`.
   `ec2:DescribeRegions` is not wired.
 - **0 compliance control evaluations.**

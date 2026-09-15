@@ -6,4 +6,4 @@
 
 ## Note
 
-AWS is the deepest provider and still NO-GO. Blocking: cost blocked on Cost Explorer (AWS-13), relationships absent (AWS-10), 0 compliance evaluations (AWS-17), scheduled path not durable (AWS-06), region-level tombstone safety unwired (AWS-12), no scale or DR rehearsal (AWS-25).
+AWS is the deepest provider and still NO-GO. Blocking: cost is blocked on Cost Explorer (AWS-13), relationships are materialized but incomplete (AWS-10), compliance has 0 evaluations (AWS-17), the scheduled path is not durable (AWS-06), region-level tombstone safety is incomplete (AWS-12), and there is no scale or DR rehearsal (AWS-25).

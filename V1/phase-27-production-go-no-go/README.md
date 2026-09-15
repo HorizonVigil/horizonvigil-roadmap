@@ -14,7 +14,7 @@
 |---|---|---|
 | 1 | Canonical inventory certified | ~11 of 32 requirements |
 | 2 | Cost produces a trustworthy number | **blocked** — Cost Explorer not enabled on one account |
-| 3 | Relationships exist | 3 edge rows |
+| 3 | Relationships exist | **181 edge rows**; materialization is proven, but coverage and generation binding remain partial |
 | 4 | Compliance has evaluations | **0** |
 | 5 | Azure / GCP on the durable contract | no — **0 collection_runs** for either |
 | 5b | AWS **scheduled** path on the durable contract | **no** — bypasses `collection_runs` entirely |
