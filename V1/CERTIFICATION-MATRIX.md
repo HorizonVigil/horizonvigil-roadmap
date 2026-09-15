@@ -21,7 +21,7 @@ Measured 2026-09-15. Detail per provider: [aws](aws/) · [azure](azure/) ·
 | Resource generations | **PASS** | NOT STARTED | NOT STARTED |
 | Relationships | NOT STARTED | NOT STARTED | NOT STARTED |
 | Lineage / reconciliation | PARTIAL | NOT STARTED | NOT STARTED |
-| Partial-scan safety | PARTIAL | NOT STARTED | NOT STARTED |
+| Partial-scan safety | **PASS** | NOT STARTED | NOT STARTED |
 | Cost — primary source | **BLOCKED** | NOT STARTED | NOT STARTED |
 | Cost — export ingestion | PARTIAL | NOT STARTED | NOT STARTED |
 | Cost reconciliation | PARTIAL | NOT STARTED | NOT STARTED |
@@ -42,7 +42,7 @@ Measured 2026-09-15. Detail per provider: [aws](aws/) · [azure](azure/) ·
 
 | | PASS | PARTIAL | NOT STARTED | FAILED / BLOCKED |
 |---|---|---|---|---|
-| AWS | **7** | 16 | 3 | 1 blocked |
+| AWS | **8** | 15 | 3 | 1 blocked |
 | GCP | 0 | 7 | 20 | — |
 | Azure | 0 | 4 | 21 | **2 failed** |
 

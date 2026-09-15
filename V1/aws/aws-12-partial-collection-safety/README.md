@@ -1,6 +1,6 @@
 # AWS-12 — Partial collection safety
 
-**Status: PARTIAL**
+**Status: PASS**
 
 **Depends on:** AWS-06
 
