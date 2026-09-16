@@ -1,6 +1,6 @@
 # AWS-19 — Health and metrics
 
-**Status: PARTIAL**
+**Status: PARTIAL — NOT_ASSESSED now distinct from UNKNOWN**
 
 **Depends on:** AWS-07
 

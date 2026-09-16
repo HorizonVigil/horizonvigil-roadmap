@@ -1,6 +1,6 @@
 # AWS-20 — Ownership and IaC
 
-**Status: PARTIAL**
+**Status: PARTIAL — UI shipped; coverage still 0%**
 
 **Depends on:** AWS-08
 

@@ -1,6 +1,6 @@
 # AWS-21 — Optimization recommendations
 
-**Status: PASS**
+**Status: PARTIAL — the generator was never triggered in production**
 
 **Depends on:** AWS-19
 
