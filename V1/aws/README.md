@@ -2,15 +2,22 @@
 
 **Overall: NO-GO.** The deepest provider, and still not certifiable.
 
-## Runtime evidence (2026-09-15)
+## Runtime evidence (2026-09-22)
 
 | measure | value |
 |---|---|
 | connections | 2 of 2 **connected** |
-| live resources | **1,905** |
-| resource types observed | **41** of 231 live scanners |
-| last sync | 2026-09-15 |
-| foundation modules | **11 of 11** |
+| live AWS resources | **918** |
+| of which real assets | **414** (374 aliases, 94 observations, 35 control statuses, 1 artifact excluded) |
+| resource types observed | **31**, all now classified |
+| last successful collection | 2026-09-20 — **two scheduled days silently skipped**, see AWS-06 |
+| cost collection | **failing since 2026-09-16** |
+
+> The earlier figure of **1,905 "live resources"** was the **all-provider**
+> total (aws 918 + gcp 988), not AWS. Corrected here; see
+> [AWS_PHASE_STATUS.md](AWS_PHASE_STATUS.md).
+
+Current gap matrix: **[AWS_PHASE_STATUS.md](AWS_PHASE_STATUS.md)** (2026-09-22).
 
 ## The shape of the gap
 
