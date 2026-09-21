@@ -1,7 +1,7 @@
 # AWS V1 — Production Gap Matrix
 
 **Date:** 2026-09-22
-**Verdict: NO-GO.** 4 blockers, all named below.
+**Verdict: NO-GO.** 5 blockers, all named below.
 
 **Method.** Every status is backed by a live production query, an HTTP probe
 against the deployed service, or a count from source read today. Nothing is
@@ -30,7 +30,7 @@ matrix that quietly revises itself is not evidence.
 | # | Phase | Status | Evidence measured 2026-09-22 | Remaining gap |
 |---|---|---|---|---|
 | 00 | Architecture / provider contract | **PARTIAL** | `/adapter-manifest` 401 auth-first (mounted); `/openapi.json` 200, **136 paths** | Contract is single-provider; GCP/Azure implement no equivalent |
-| 01 | Tenant / org / scope | **PARTIAL** | `organizations: not_enabled` on both connections | OU walk has **never executed** against a real org |
+| 01 | Tenant / org / scope | **PARTIAL** | Isolation suite **44 of 45 pass**; the 45th has failed **30 consecutive runs** since ≥09-15 | OU walk has **never executed** against a real org; one aggregate isolation check is **vacuous** — see below |
 | 02 | Connection | **PASS** | 2 of 2 `connected` | — |
 | 03 | Credential lifecycle | **PARTIAL** | *not re-measured today* | No rotation has been executed end to end |
 | 04 | Permission validation | **PASS** (defect fixed) | 24 capability rows, 12 per connection | **Freshness was never evaluated** — fixed, see PR #36 |
@@ -54,9 +54,9 @@ matrix that quietly revises itself is not evidence.
 | 22 | Changes and activity | **PASS** | 484 audit rows | — |
 | 23 | Reports and exports | **PARTIAL** | 2 reports | Field/section selection; `supersedes_id` unwritten; signed links 503 (no service-role key on `reports`) |
 | 24 | API hardening | **PARTIAL** | 136 OpenAPI paths, **0 internal leaked**, **0 tenant-scoped** | `/api/v1/tenants/{id}` still does not exist; Idempotency-Key not required; ETag on one mutation |
-| 25 | Performance / DR / a11y | **NOT STARTED** | — | **BLOCKER 4** |
+| 25 | Performance / DR / a11y | **NOT STARTED** | — | **BLOCKER 5** |
 | 26 | End-to-end certification | **NOT STARTED** | — | Needs 25 |
-| 27 | Production GO / NO-GO | **NO-GO** | — | 4 blockers |
+| 27 | Production GO / NO-GO | **NO-GO** | — | 5 blockers |
 
 ---
 
@@ -99,7 +99,32 @@ The single most important cloud posture check. The EC2 scanner stores
 available. Honestly declared as a gap rather than passed — but it is a gap on
 the check customers most expect.
 
-### 4. Scale, DR and accessibility have never been exercised
+### 4. One tenant-isolation assertion has been vacuous for a week
+
+**This is a proof gap, not a known leak.** 44 of the 45 isolation tests pass,
+including every by-id and disjoint-scope case. The one that fails is the
+*anti-vacuity guard*:
+
+```
+aggregates never count another tenant
+  ✓ the dashboard totals exclude Tenant B
+  × the dashboard actually returns alerts, so the check above is not vacuous
+```
+
+`/api/aws-accounts/dashboard` answers **400** against the integration project,
+so its alerts block returns nothing **for every tenant** — which means the
+assertion directly above it passes without ever having been capable of
+failing. The test's own docstring predicts exactly this (`alerts` seeded with
+`title`/`created_at` where production has `alert_name`/`triggered_at`).
+
+It has failed **30 consecutive runs**. A guard written to stop a vacuous pass
+is doing its job and being ignored.
+
+**Not fixable from here:** the suite targets a third Supabase project
+(`INTEGRATION_SUPABASE_URL`), which is not among the two projects reachable
+from this environment.
+
+### 5. Scale, DR and accessibility have never been exercised
 
 Unchanged and **not completable from this environment**: the estate is 2
 accounts and 918 AWS resources; no restore rehearsal has been performed; WCAG
