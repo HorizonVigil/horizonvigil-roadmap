@@ -1,7 +1,7 @@
 # AWS V1 — Production Gap Matrix
 
 **Date:** 2026-09-22
-**Verdict: NO-GO.** 5 blockers, all named below.
+**Verdict: NO-GO.** 5 blockers named below; **2 fixed on 2026-09-22**, 3 open.
 
 **Method.** Every status is backed by a live production query, an HTTP probe
 against the deployed service, or a count from source read today. Nothing is
@@ -30,12 +30,12 @@ matrix that quietly revises itself is not evidence.
 | # | Phase | Status | Evidence measured 2026-09-22 | Remaining gap |
 |---|---|---|---|---|
 | 00 | Architecture / provider contract | **PARTIAL** | `/adapter-manifest` 401 auth-first (mounted); `/openapi.json` 200, **136 paths** | Contract is single-provider; GCP/Azure implement no equivalent |
-| 01 | Tenant / org / scope | **PARTIAL** | Isolation suite **44 of 45 pass**; the 45th has failed **30 consecutive runs** since ≥09-15 | OU walk has **never executed** against a real org; one aggregate isolation check is **vacuous** — see below |
+| 01 | Tenant / org / scope | **PASS** (defect fixed) | Isolation suite **45 of 45** — green for the first time in 30+ runs, with a STRICTER anti-vacuity assertion | OU walk has **never executed** against a real org |
 | 02 | Connection | **PASS** | 2 of 2 `connected` | — |
 | 03 | Credential lifecycle | **PARTIAL** | *not re-measured today* | No rotation has been executed end to end |
 | 04 | Permission validation | **PASS** (defect fixed) | 24 capability rows, 12 per connection | **Freshness was never evaluated** — fixed, see PR #36 |
 | 05 | Region / location | **PASS** | 17 regional steps per scanner per run | `provider_regions.opt_in_required` all NULL |
-| 06 | Durable collection jobs | **FAILED → fixed, unverified in prod** | 18 runs, 22,797 steps; **2 of 5 daily collections silently skipped**; finalize judged runs on a truncated page | Both fixed in PR #36; **not yet deployed** |
+| 06 | Durable collection jobs | **FAILED → fixed, awaiting runtime proof** | 18 runs, 22,797 steps; **2 of 5 daily collections silently skipped**; finalize judged runs on a truncated page | Both fixed + missed-period detection added; needs the next 18:30 UTC tick |
 | 07 | Resource discovery | **PASS** | 1,628/1,628 steps on each recent run | Zero-result inferred, not first-class |
 | 08 | Canonical inventory | **PASS** (closed today) | **0** observed AWS types unclassified (was 10 / 52 rows); **414** real assets | 212 catalog types unmapped, none observed on this estate |
 | 09 | Resource generations | **PASS** | *not re-measured today* | — |
@@ -45,7 +45,7 @@ matrix that quietly revises itself is not evidence.
 | 13 | Cost — primary source | **FAILED** | Capability `available` but **last success 2026-09-15**; **32 rows, 0 non-zero**; scheduled sync **503 daily since 09-16** | **BLOCKER 1** — see below |
 | 14 | Cost — export ingestion | **PARTIAL** | *not re-measured today* | CUR config unreachable — `POST cur/discover` is its only writer and nothing calls it |
 | 15 | Cost reconciliation | **BLOCKED** | 0 rows | Cannot pass until 13 and 14 |
-| 16 | Security posture | **PARTIAL** | 2 derived findings live; all 4 rules evaluable | **61 security groups** collected, open-ingress **not computable** — the scanner stores `inboundRuleCount`, not the rules |
+| 16 | Security posture | **PARTIAL** (gap closed) | 2 derived findings live; **5** rules now, open-ingress implemented | Needs a rescan before the 61 groups carry rules; until then they report `NOT_COLLECTED`, never `PASS` |
 | 17 | Compliance | **PARTIAL** | 10 evaluations, **all `connection_id` NULL**, newest 2026-09-16; `compliance_benchmarks` **0 rows** | 5 of ~60 CIS controls; **no evaluation is attributable to an AWS connection** |
 | 18 | IAM / identity | **PASS** | 34 identities: 7 users (**all MFA disabled**), 27 roles (`mfa_enabled` NULL — correct, a role has none) | Inactive-identity age thresholds |
 | 19 | Health and metrics | **PARTIAL** (defect fixed) | Stale capability reported as `available` | Fixed in PR #36; CloudWatch metric breadth still thin |
@@ -92,18 +92,30 @@ All 10 `control_evaluations` rows carry `connection_id = NULL`, and
 may put in front of an auditor; one that cannot name the account it describes
 is not evidence. Newest evaluation is 2026-09-16.
 
-### 3. Open-ingress cannot be evaluated on 61 collected security groups
+### 3. ~~Open-ingress cannot be evaluated on 61 security groups~~ — FIXED 2026-09-22
 
-The single most important cloud posture check. The EC2 scanner stores
-`inboundRuleCount` and discards the rules, so the CIDR of each rule is not
-available. Honestly declared as a gap rather than passed — but it is a gap on
-the check customers most expect.
+The single most important cloud posture check. The EC2 scanner stored
+`inboundRuleCount` and discarded the rules, so the CIDR of each rule was not
+available. It was honestly declared a gap rather than passed — but a gap on
+the check customers most expect is still a gap.
 
-### 4. One tenant-isolation assertion has been vacuous for a week
+**Now implemented.** Rules are normalized and retained by the collector; the
+severity policy lives in `horizonvigil-security` with a stamped policy
+version. Deliberately not "0.0.0.0/0 is critical": a load balancer on 443 from
+anywhere is the point of a public web service, and scoring it like an exposed
+database teaches people to dismiss the finding.
 
-**This is a proof gap, not a known leak.** 44 of the 45 isolation tests pass,
-including every by-id and disjoint-scope case. The one that fails is the
-*anti-vacuity guard*:
+The 61 groups already in inventory carry no rules, so they report
+**`NOT_COLLECTED`** — never `PASS` — until their next collection. Still needs
+a deploy and one scan cycle before it produces real findings.
+
+### 4. ~~One tenant-isolation assertion has been vacuous~~ — FIXED 2026-09-22
+
+**Resolved: the suite is now 45/45 with a STRICTER assertion.** Kept as the
+record of what was wrong, and of what I got wrong about it.
+
+44 of the 45 isolation tests passed, including every by-id and disjoint-scope
+case. The one that failed was the *anti-vacuity guard*:
 
 ```
 aggregates never count another tenant
@@ -117,12 +129,20 @@ assertion directly above it passes without ever having been capable of
 failing. The test's own docstring predicts exactly this (`alerts` seeded with
 `title`/`created_at` where production has `alert_name`/`triggered_at`).
 
-It has failed **30 consecutive runs**. A guard written to stop a vacuous pass
-is doing its job and being ignored.
+It had failed **30 consecutive runs**. A guard written to stop a vacuous pass
+was doing its job and being ignored.
 
-**Not fixable from here:** the suite targets a third Supabase project
-(`INTEGRATION_SUPABASE_URL`), which is not among the two projects reachable
-from this environment.
+**My first diagnosis was wrong.** The test's docstring blamed the fixture's
+`alerts` table, and I took that as the live cause and concluded it needed a
+Supabase project unreachable from here. That docstring described a
+*previously fixed* issue. The real cause was six independent reads behind one
+`Promise.all`: any single failure returned 400, so the dashboard produced
+nothing for **every** tenant. Fixing that composition alone took the suite to
+45/45 with no fixture change at all.
+
+The assertion was then tightened rather than left at green — it now requires
+`unavailableSections` to be empty, because per-section degradation would
+otherwise convert a loud 400 into a quiet vacuum.
 
 ### 5. Scale, DR and accessibility have never been exercised
 
