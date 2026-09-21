@@ -46,7 +46,7 @@ matrix that quietly revises itself is not evidence.
 | 14 | Cost — export ingestion | **PARTIAL** | *not re-measured today* | CUR config unreachable — `POST cur/discover` is its only writer and nothing calls it |
 | 15 | Cost reconciliation | **BLOCKED** | 0 rows | Cannot pass until 13 and 14 |
 | 16 | Security posture | **PARTIAL** (gap closed) | 2 derived findings live; **5** rules now, open-ingress implemented | Needs a rescan before the 61 groups carry rules; until then they report `NOT_COLLECTED`, never `PASS` |
-| 17 | Compliance | **PARTIAL** | 10 evaluations, **all `connection_id` NULL**, newest 2026-09-16; `compliance_benchmarks` **0 rows** | 5 of ~60 CIS controls; **no evaluation is attributable to an AWS connection** |
+| 17 | Compliance | **PARTIAL** (defect fixed) | 10 evaluations exist; readers matched **0** — score was structurally unreachable, hiding **6 FAILED** controls | 5 of ~60 CIS controls; needs deploy; `compliance_benchmarks` 0 rows |
 | 18 | IAM / identity | **PASS** | 34 identities: 7 users (**all MFA disabled**), 27 roles (`mfa_enabled` NULL — correct, a role has none) | Inactive-identity age thresholds |
 | 19 | Health and metrics | **PARTIAL** (defect fixed) | Stale capability reported as `available` | Fixed in PR #36; CloudWatch metric breadth still thin |
 | 20 | Ownership and IaC | **PARTIAL** | **0** ownership rows, **0** IaC links → **0%** coverage of 414 assets | Drift detection absent; no repo/module/commit mapping |
@@ -85,12 +85,34 @@ and the only trace was a status code on a Cloud Scheduler job.
 Code fixed in **PR #36**. **Not resolved until the repository secret exists** —
 see *Required from you*.
 
-### 2. Compliance has no evidence attributable to an AWS connection
+### 2. The compliance score was structurally unreachable — FIXED 2026-09-22
 
-All 10 `control_evaluations` rows carry `connection_id = NULL`, and
-`compliance_benchmarks` is empty. A compliance score is something a customer
-may put in front of an auditor; one that cannot name the account it describes
-is not evidence. Newest evaluation is 2026-09-16.
+I first reported this as "no evidence is attributable to an AWS connection",
+reading `connection_id = NULL` on all 10 rows as missing attribution. **That
+was wrong.** The write is deliberate and correct: those controls are assessed
+across every permitted connection at once, and `evaluateCompliance.ts` says so
+— "claiming a narrower scope than was evaluated would misstate the evidence".
+The rows carry `scope_type: 'org'` and `scope_id`, which IS attribution.
+
+The real defect was on the **read** side, and it was worse. All three readers
+filtered `connection_id: inFilter(connectionIds)`, and PostgREST's `in.(...)`
+never matches NULL — so no reader could see a single row the writer produced.
+
+| | |
+|---|---|
+| evaluations that exist | **10** |
+| rows the readers matched | **0** |
+| hidden verdicts | **1 passed, 6 FAILED**, 3 not_evaluated |
+| score the customer saw | `null` (should have been **14.3%**) |
+
+Six failing compliance controls were invisible, and the score could never be
+anything but null however many evaluations ran. The product looked
+un-evaluated while holding six failures.
+
+Fixed: one shared scope filter for all three readers, with deny-by-default
+made explicit — `is.null` matches org-scoped rows on its own, so an empty
+permitted set would otherwise hand the whole org's compliance evidence to a
+caller entitled to none of it.
 
 ### 3. ~~Open-ingress cannot be evaluated on 61 security groups~~ — FIXED 2026-09-22
 
