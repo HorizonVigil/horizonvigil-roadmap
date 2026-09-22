@@ -158,8 +158,21 @@ and 918 resources; no restore rehearsal has been performed; WCAG 2.2 AA has
 
 ## Deployment certification
 
-`connector-aws-00206-rnr` deployed 2026-09-21T20:05 — the first new revision
-since 09-16. Verified immediately after:
+Four services deployed via the documented `cloudbuild.yaml` path, which passes
+no `--set-env-vars` and therefore cannot repeat the wipe that caused blocker 3.
+Verified after each:
+
+| service | revision | previous |
+|---|---|---|
+| connector-aws | **00207-7sm** | 00205 (2026-09-16) |
+| security | **00087-qzn** | 00086 (2026-09-16) |
+| resources | **00052-hsp** | 00051 |
+| reports | **00048-sx9** | 00047 (2026-09-10) |
+
+connector-aws's image digest changed (`09263361…` → `5e9ed789…`), proving new
+code rather than a re-tag, and all 8 environment variables survived.
+
+Gate sweep after the final deploy:
 
 | check | result |
 |---|---|
@@ -171,6 +184,10 @@ since 09-16. Verified immediately after:
 | mounted endpoints | **401 auth-first ×3** |
 | bogus route control | **404** |
 | `/openapi.json` | 200, 136 paths, **0 internal leaked** |
+| `collection-runs`, `cur-runs`, `capabilities` (POST/GET) | **401 auth-first** |
+| reports: list, preview, download-grant | **401 auth-first**, bogus 404 |
+| resources: dashboard, ownership, explorer | **401 auth-first**, bogus 404 |
+| security: 5 posture + 6 compliance | **401 auth-first**, bogus 404 |
 | cost sync | **503** — expected, blocker 3 unresolved |
 
 No regression in any previously-certified gate.
