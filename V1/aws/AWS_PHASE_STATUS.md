@@ -43,7 +43,7 @@ matrix that quietly revises itself is not evidence.
 | 11 | Lineage + reconciliation | **PASS** | Last 3 runs **1,509/1,509 batches linked** | 12,072 of 36,548 linked overall — the remainder predates the feature |
 | 12 | Partial collection safety | **PARTIAL** | 143 AWS tombstones, ordinary churn | Depended on AWS-06's truncated finalize; needs re-proof after PR #36 deploys |
 | 13 | Cost — primary source | **FAILED** | Capability `available` but **last success 2026-09-15**; **32 rows, 0 non-zero**; scheduled sync **503 daily since 09-16** | **BLOCKER 1** — see below |
-| 14 | Cost — export ingestion | **PARTIAL** | *not re-measured today* | CUR config unreachable — `POST cur/discover` is its only writer and nothing calls it |
+| 14 | Cost — export ingestion | **PARTIAL** (reachability closed) | `cur/discover` + `cur-runs` **live in the deployed bundle** (`CloudAccountDetail-D2wE0qPg.js`); both connections `cur_configured = false` | Reachable and working, but **never run**: one account has no CUR defined in AWS at all |
 | 15 | Cost reconciliation | **BLOCKED** | 0 rows | Cannot pass until 13 and 14 |
 | 16 | Security posture | **PARTIAL** (gap closed) | 2 derived findings live; **5** rules now, open-ingress implemented | Needs a rescan before the 61 groups carry rules; until then they report `NOT_COLLECTED`, never `PASS` |
 | 17 | Compliance | **PARTIAL** (defect fixed) | 10 evaluations exist; readers matched **0** — score was structurally unreachable, hiding **6 FAILED** controls | 5 of ~60 CIS controls; needs deploy; `compliance_benchmarks` 0 rows |

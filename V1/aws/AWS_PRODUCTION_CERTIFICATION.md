@@ -182,13 +182,27 @@ back to a commit. That is itself a production-readiness gap and is unchanged.
 
 ## Test report
 
+Repos changed this pass:
+
 | repo | before | after | delta |
 |---|---|---|---|
-| connector-aws | 544 | **621** | +77 |
+| connector-aws | 544 | **629** | +85 |
 | security | 57 | **109** | +52 |
 | resources | 32 | **43** | +11 |
 | reports | 63 | **63** | — |
-| **total** | 696 | **836** | **+140** |
+
+Whole fleet, re-run at the end of the pass:
+
+| repo | tests |
+|---|---|
+| connector-aws | 629 |
+| frontend | 669 |
+| shared-lib | 214 |
+| cost | 147 |
+| security | 109 |
+| reports | 63 |
+| resources | 43 |
+| **total** | **1,874** |
 
 | metric | value |
 |---|---|
@@ -197,6 +211,7 @@ back to a commit. That is itself a production-readiness gap and is unchanged.
 | flaky | 0 |
 | integration / isolation | **45 / 45** |
 | tamper-verified guards | **6** |
+| fleet total | **1,874 passing** |
 
 ### Tamper verification
 
