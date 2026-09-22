@@ -172,13 +172,13 @@ compiling. Items still open are named as open.
 | # | Item | Sev | Owner | Status |
 |---|---|---|---|---|
 | 1 | **C3** S3 buckets quarantined | CRITICAL | eng | **DONE - verified live** |
-| 2 | **C1** Monitoring and alerting | CRITICAL | eng + owner | **PARTLY DONE** - see below |
+| 2 | **C1** Monitoring and alerting | CRITICAL | eng + owner | **DONE - alert fired and verified** |
 | 3 | **C2** SHA-tagged images | CRITICAL | eng | **DONE - verified live** |
 | 4 | **H1** Re-apply IAM policy to both roles | HIGH | owner | **OPEN - owner action** |
 | 5 | **H3** Credential-rollback privilege escalation | HIGH | eng | **DONE - verified live** |
 | 6 | **H4** Surface and alert on quarantine | HIGH | eng | **DONE** |
-| 7 | **H2** Empty states honest across 14 files | HIGH | eng | **PARTLY DONE** - 9 of 51 |
-| 8 | **M1** `SUPABASE_SERVICE_ROLE_KEY` on `reports` | MEDIUM | owner | **OPEN - owner action** |
+| 7 | **H2** Empty states honest across 14 files | HIGH | eng | **PARTLY DONE** - 13 of ~40 |
+| 8 | **M1** `SUPABASE_SERVICE_ROLE_KEY` on `reports` | MEDIUM | owner | **DONE - verified live** |
 | 9 | **M2** Degradation on the success path | MEDIUM | eng | **DONE** |
 | 10 | **M3** Cost sync refreshes capability row | MEDIUM | eng | **DONE** |
 | 11 | **M4** S3 45-bucket cap | MEDIUM | eng | **DONE** |
@@ -231,26 +231,81 @@ excluded from the scheduler policy by name so the policy is actionable on day
 one rather than firing hourly on a known condition. The exclusion is written
 into the policy's own documentation, not hidden.
 
-**Not done - blocked:** `ALERTS_API_URL` on `connector-aws`, and
-`POST_SCAN_HOOK_SECRET` + `SUPABASE_SERVICE_ROLE_KEY` on `observability`. The
-route is `observability`'s `/internal/evaluate-alert-rules`, NOT `automation` as
-this audit stated. It returns an honest 503 today. Copying the secrets was
-refused by the environment's permission classifier; it needs the owner.
-`ALERTS_API_URL` is deliberately left unset until then - setting it first would
-turn an honest "not configured" into a hook that fails on every scan.
+**Hook wiring - now DONE.** `POST_SCAN_HOOK_SECRET` +
+`SUPABASE_SERVICE_ROLE_KEY` set on `observability`, `ALERTS_API_URL` set on
+`connector-aws`. The route is `observability`'s
+`/internal/evaluate-alert-rules`, NOT `automation` as this audit stated.
+
+Verified by running a REAL evaluation against a real connection and org:
+
+    {"evaluated": 0, "created": 0, "coverageComplete": true,
+     "resourcesExamined": 492,
+     "unevaluable": [{"name": "UI Test Rule",  "reason": "empty_condition"},
+                     {"name": "Test Rule 2",   "reason": "empty_condition"}]}
+
+`evaluated: 0`, not 2 - the same call on the old code answered "2 rules
+evaluated, 0 alerts created", a clean bill of health from a run that evaluated
+nothing. `resourcesExamined: 492` confirms the paged read replaced the
+PostgREST-capped one.
+
+The cost-side hooks were dead for the same reason and are now live too:
+`/internal/generate-recommendations` and `/internal/reevaluate-recommendations`
+both return real results. Recommendation re-evaluation last ran
+**2026-09-22 18:42** - the operational root cause of the three-week-stale
+recommendations is closed, not just the code path.
+
+**Alert fired and verified.** A temporary scheduler job was created pointing at
+a non-existent route, fired once, and deleted. It produced a genuine
+`severity=ERROR / NOT_FOUND` entry, and querying the logs with the alert
+policy's own filter verbatim returned it - along with proof that the
+`scheduled-scan-trivy` exclusion actually excludes. What is NOT proven is
+delivery of the notification email; Cloud Monitoring exposes no public
+incidents API to check it from here.
 
 **The two empty rules:** not deleted. They are a customer's data. Instead they
 now render as **"never fires"** with the reason, and "Evaluate Now" reports how
 many rules could not be evaluated - it previously answered "2 rules evaluated -
 no new matches", a clean bill of health from a run that evaluated nothing.
 
-### H2 - 9 of 51
+### H2 - 13 of ~40, and this audit's count of 51 corrected
 
-`describeEmptyState` now turns capability availability and scan completeness
-into the sentence, and EksConsole - the file this audit named worst - is
-converted. **42 empty states across 13 other files still render from array
-length.** The mechanism exists and is tested; each remaining page needs its own
-evidence wired through, which is real work per page rather than a sweep.
+`describeEmptyState` turns capability availability and scan completeness into
+the sentence. Converted: **EksConsole** (9, the file this audit named worst),
+**Resources** (3) and **CostOptimization** (2 - which also required adding a
+client for `/cost-source-status`, an endpoint that has existed server-side
+since Phase 2 with nothing calling it).
+
+**The 51 figure is wrong and should not be used as the target.** Of those 51:
+
+| kind | count | action |
+|---|---|---|
+| search / filter results ("No resources match this search") | 9 | **leave as-is** - correctly array-length based; converting them would make them wrong |
+| already qualify their own emptiness | 2 | leave |
+| genuine coverage claims | ~40 | 13 converted, ~27 remain |
+
+A test pins the search/filter states as deliberately unchanged, so a future
+sweep does not "fix" them into inaccuracy.
+
+Remaining, by file: Automation (7), GkeConsole (6), Alerts (6), Monitoring (3),
+CloudAccounts (2), Subscription (2), Reports (1), Issues (1). Excluded as
+V2-gated and unreachable in V1: VulnerabilityManagement (5),
+ContainerKubernetesSecurity (2), SourceInventoryCategory (1), Incidents (1).
+
+### Found BY the new alerting, within minutes of it existing
+
+**`scheduled-scan-gcp` has been failing since 2026-09-11 - 12 consecutive
+daily runs, 11 days with no GCP scan.** It returns `INVALID_ARGUMENT` (HTTP
+400) from `connector-gcp`'s `/internal/run-due-scans`, and the cause is a
+secret MISMATCH, not a missing header: the job sends `X-Internal-Scan-Secret`
+and `connector-gcp` has `INTERNAL_SCAN_SECRET` set, but the values differ -
+one was rotated without the other.
+
+This is GCP, explicitly outside this audit's AWS-only scope, so it is recorded
+rather than fixed. The fix is one command: copy `connector-gcp`'s
+`INTERNAL_SCAN_SECRET` into the scheduler job's header.
+
+That the alerting surfaced an 11-day silent outage within minutes of being
+switched on is the strongest available evidence that C1 was worth doing.
 
 ### Beyond the worklist - two defects found while fixing it
 
@@ -280,15 +335,28 @@ last reported as itself rather than as a pass.
 
 ### Post-remediation caveats (2026-09-22)
 
-- The alert policies are configured and enabled but have **not been fired in
-  anger**. This audit's own verification standard asks for "disable a scheduler
-  job -> alert fires within its window"; that test has not been run.
+- The alert policy's filter was fired and verified against a real ERROR entry.
+  **Notification DELIVERY is still unproven** - Cloud Monitoring exposes no
+  public incidents API, so whether the email arrived cannot be checked from
+  here. Confirm one landed in the inbox.
 - Authenticated UI flows remain unverified - no test credential exists, and the
   standing action is to rotate the one previously shared.
-- H2 is 9 of 51. H1 and M1 are owner actions and untouched. C1's hook wiring is
-  blocked on secret propagation.
+- H2 is 13 of ~40 genuine coverage claims (see section 7 for why "51" is the
+  wrong denominator).
+- **H1 is the only remaining launch blocker**, and it is an owner action: the
+  deployed IAM roles are an older version of the published policy, so lambda,
+  kafka, securityhub, imagebuilder, macie2, fms and license-manager are denied
+  in production.
+- A `service_role` key was pasted into a chat transcript on 2026-09-22 to
+  unblock the hook wiring. **It should be rotated**, and the four services
+  carrying it (connector-aws, connector-gcp, connector-azure, cost,
+  observability, reports) updated.
 
-**AWS is not yet production-ready, and no certification is claimed.** Every
-CRITICAL is now either closed and verified or explicitly blocked on an owner
-action, but two HIGH items (H1, H2) remain open and the alerting built for C1
-has not yet been proven by firing.
+**AWS is not yet production-ready, and no certification is claimed.** All
+three CRITICAL items are closed and verified against production. Of the HIGH
+items, H3 and H4 are done; **H1 remains open and is the single remaining
+launch blocker** - an owner action, re-applying the published IAM policy to
+both roles. H2 is materially improved but incomplete (13 of ~40).
+
+What would make certification claimable: H1 applied and the 10 degraded types
+confirmed clear, H2 finished, and one alert notification confirmed delivered.
