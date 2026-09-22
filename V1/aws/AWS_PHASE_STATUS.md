@@ -51,7 +51,7 @@ matrix that quietly revises itself is not evidence.
 | 19 | Health and metrics | **PARTIAL** (defect fixed) | Stale capability reported as `available` | Fixed in PR #36; CloudWatch metric breadth still thin |
 | 20 | Ownership and IaC | **PARTIAL** | **0** ownership rows, **0** IaC links → **0%** coverage of 414 assets | Drift detection absent; no repo/module/commit mapping |
 | 21 | Optimization recommendations | **PASS** | 3 open: mix of `actionable` and `target_gone` | Validity model working as designed |
-| 22 | Changes and activity | **PASS** | 484 audit rows | — |
+| 22 | Changes and activity | **PASS** (extended) | 484 audit rows; **actor provenance shipped** — classifies human / automation / AWS-service and names the tool | GCP/Azure feeds carry no equivalent signals, so they are deliberately unclassified |
 | 23 | Reports and exports | **PARTIAL** | 2 reports | Field/section selection; `supersedes_id` unwritten; signed links 503 (no service-role key on `reports`) |
 | 24 | API hardening | **PARTIAL** | 136 OpenAPI paths, **0 internal leaked**, **0 tenant-scoped** | `/api/v1/tenants/{id}` still does not exist; Idempotency-Key not required; ETag on one mutation |
 | 25 | Performance / DR / a11y | **NOT STARTED** | — | **BLOCKER 5** |
