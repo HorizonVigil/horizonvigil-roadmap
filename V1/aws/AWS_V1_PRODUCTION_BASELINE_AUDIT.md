@@ -174,7 +174,7 @@ compiling. Items still open are named as open.
 | 1 | **C3** S3 buckets quarantined | CRITICAL | eng | **DONE - verified live** |
 | 2 | **C1** Monitoring and alerting | CRITICAL | eng + owner | **DONE - alert fired and verified** |
 | 3 | **C2** SHA-tagged images | CRITICAL | eng | **DONE - verified live** |
-| 4 | **H1** Re-apply IAM policy to both roles | HIGH | owner | **OPEN - owner action** |
+| 4 | **H1** Re-apply IAM policy to both roles | HIGH | owner | **RESOLVED by owner - with a caveat, see below** |
 | 5 | **H3** Credential-rollback privilege escalation | HIGH | eng | **DONE - verified live** |
 | 6 | **H4** Surface and alert on quarantine | HIGH | eng | **DONE** |
 | 7 | **H2** Empty states honest across 14 files | HIGH | eng | **PARTLY DONE** - 13 of ~40 |
@@ -291,6 +291,86 @@ CloudAccounts (2), Subscription (2), Reports (1), Issues (1). Excluded as
 V2-gated and unreachable in V1: VulnerabilityManagement (5),
 ContainerKubernetesSecurity (2), SourceInventoryCategory (1), Incidents (1).
 
+### H1 - resolved by the owner, and what it then exposed
+
+The owner attached **AdministratorAccess** to the IAM user whose access keys
+both connections use, and re-ran validation. All seven services this audit
+named are now granted:
+
+| service | before | after |
+|---|---|---|
+| lambda, kafka, securityhub, imagebuilder, macie2, fms, license-manager | denied | **granted, or an honest account state** |
+
+`securityhub` is the clearest example of the difference: it moved from
+`denied` - which sends someone to edit an IAM policy - to `not_applicable`
+"Security Hub is not enabled in this region", which is a console toggle they
+own.
+
+**The caveat, recorded rather than argued.** AdministratorAccess contradicts
+this programme's own stated constraint: *"Collection role MUST NOT contain:
+execution, destructive actions, mutation, credential-producing actions,
+credential retrieval actions, remediation."* AC-12 removed eight
+credential-producing permissions from the published least-privilege policy for
+exactly that reason; admin restores all of them and more. A leaked access key
+now has full control of the account rather than read-only. The narrower fix -
+re-applying the published policy - achieves the same collection coverage
+without that exposure. This is the owner's decision and it is implemented;
+it is noted here so the tradeoff is on the record, not to reopen it.
+
+### Three defects the admin grant made visible
+
+Removing seven real denials is what exposed these. While the list was full of
+genuine failures, more failures looked like more of the same.
+
+**1. AWS Health had never worked.** The probe sent `maxResults: 1`; AWS Health
+requires `>= 10`. Every call since the probe was written was rejected with a
+validation error, and the probe reported `error` - never once testing the
+permission it exists to test. "Our request was malformed" was
+indistinguishable from "AWS Health is unavailable". Fixed; it now returns the
+truth for both accounts: *"The AWS Health API requires a Business or
+Enterprise support plan."*
+
+**2. `connector_capability_status` had NEVER been written successfully.**
+The table froze on 2026-09-09 and 2026-09-15. Every capability state a
+customer saw was that stale, and a validation that ran minutes earlier left it
+untouched and said nothing.
+
+The upsert used `resolution=merge-duplicates` with **no `on_conflict`**. The
+table's PRIMARY KEY is a surrogate `id`; the uniqueness that matters is a
+separate index on `(connection_id, capability)`. PostgREST resolves
+merge-duplicates against the PRIMARY KEY unless told otherwise - so every row
+got a fresh id, found no primary-key conflict to merge, and was attempted as
+an INSERT that then violated the unique index. A `catch` turned that into one
+console line.
+
+Evidence: a validation finished 18:50:47 and the logs carry
+`[capability-status] write failed` at 18:50:47.666 for both connections. Every
+other upsert in the connector - fifteen of them - names its conflict target;
+this was the only one that did not.
+
+After the fix, all 24 rows updated, and **two capabilities moved from a wrong
+state to a true one**:
+
+| capability | was (frozen) | now |
+|---|---|---|
+| `recommendations` (kamal-k8s) | `failed` / multiple_probes_unavailable | `not_enabled` / compute_optimizer_not_enabled |
+| `billing_cost_explorer` (pavan-test1) | `failed` / cost_explorer_probe_failed | `not_enabled` / cost_explorer_not_enabled |
+
+Both had been reported as faults in the product when they are account states
+the customer can fix in a console.
+
+**3. Inspector is denied under AdministratorAccess, and that is unexplained.**
+Both connections return AccessDenied on `inspector2:BatchGetAccountStatus`
+while carrying admin, in accounts belonging to no AWS Organization - so there
+is no policy gap and no SCP that could explain it. Amazon Inspector returns
+AccessDenied for this call in accounts where the service was never activated.
+
+The probe cannot distinguish the two from the response, so it no longer
+asserts the one that is wrong here; it names both causes and puts the cheaper
+check first. **Owner action: confirm whether Amazon Inspector is activated in
+604179600483 and 354307071074.** If it is activated and this persists, there
+is a permissions boundary or similar constraint on the IAM user worth finding.
+
 ### Found BY the new alerting, within minutes of it existing
 
 **`scheduled-scan-gcp` has been failing since 2026-09-11 - 12 consecutive
@@ -343,10 +423,12 @@ last reported as itself rather than as a pass.
   standing action is to rotate the one previously shared.
 - H2 is 13 of ~40 genuine coverage claims (see section 7 for why "51" is the
   wrong denominator).
-- **H1 is the only remaining launch blocker**, and it is an owner action: the
-  deployed IAM roles are an older version of the published policy, so lambda,
-  kafka, securityhub, imagebuilder, macie2, fms and license-manager are denied
-  in production.
+- H1 is resolved by the owner via AdministratorAccess. The least-privilege
+  tradeoff is recorded in section 7 and is not reopened here.
+- **Inspector remains denied under admin and is unexplained** - confirm
+  whether Amazon Inspector is activated in both accounts.
+- The degraded-resource-type count after the admin grant had not finished
+  re-measuring when this was written; a full scan was triggered at 18:59.
 - A `service_role` key was pasted into a chat transcript on 2026-09-22 to
   unblock the hook wiring. **It should be rotated**, and the four services
   carrying it (connector-aws, connector-gcp, connector-azure, cost,
@@ -358,5 +440,6 @@ items, H3 and H4 are done; **H1 remains open and is the single remaining
 launch blocker** - an owner action, re-applying the published IAM policy to
 both roles. H2 is materially improved but incomplete (13 of ~40).
 
-What would make certification claimable: H1 applied and the 10 degraded types
-confirmed clear, H2 finished, and one alert notification confirmed delivered.
+What would make certification claimable: the 10 degraded types confirmed
+clear on a full scan under the new permissions, Inspector's denial explained,
+H2 finished, and one alert notification confirmed delivered.
