@@ -165,27 +165,110 @@ Current run: **32 degraded types, 23 reasons** — 9 unexplained, with nothing m
 
 ## 7. Definitive AWS production worklist, by priority
 
-| # | Item | Sev | Owner | Blocker |
-|---|---|---|---|---|
-| 1 | **C3** S3 buckets quarantined — inventory, posture and cost all wrong | CRITICAL | eng | **YES** |
-| 2 | **C1** Monitoring and alerting | CRITICAL | eng + owner | **YES** |
-| 3 | **C2** SHA-tagged images | CRITICAL | eng | **YES** |
-| 4 | **H1** Re-apply IAM policy to both roles | HIGH | owner | **YES** |
-| 5 | **H3** Credential-rollback privilege escalation | HIGH | eng + decision | **YES** |
-| 6 | **H4** Surface and alert on quarantine | HIGH | eng | **YES** |
-| 7 | **H2** Empty states honest across 14 files | HIGH | eng | **YES** |
-| 8 | **M1** `SUPABASE_SERVICE_ROLE_KEY` on `reports` | MEDIUM | owner | no |
-| 9 | **M2** Degradation on the success path | MEDIUM | eng | no |
-| 10 | **M3** Cost sync refreshes capability row | MEDIUM | eng | no |
-| 11 | **M4** S3 45-bucket cap | MEDIUM | eng | no |
-| 12 | **M5** Surface unexplained degraded types | MEDIUM | eng | no |
-| 13 | **L1** Pin Actions to SHAs | LOW | eng | no |
-| 14 | **L2** Confirm placeholder account id unreachable | LOW | eng | no |
-| — | Enable Cost Explorer on `354307071074` | — | owner | no |
-| — | MFA for 7 human IAM identities | — | owner | no |
-| — | Merge connector-aws#37, supabase#14 | — | owner | no |
+**Status as of 2026-09-22, after the remediation pass.** Every "done" below was
+verified against production or by a tamper-checked test, not by the change
+compiling. Items still open are named as open.
 
-**Out of scope, unchanged:** cross-account AssumeRole (blocked on HorizonVigil owning an AWS account), server scaling, DR, GCP, Azure.
+| # | Item | Sev | Owner | Status |
+|---|---|---|---|---|
+| 1 | **C3** S3 buckets quarantined | CRITICAL | eng | **DONE - verified live** |
+| 2 | **C1** Monitoring and alerting | CRITICAL | eng + owner | **PARTLY DONE** - see below |
+| 3 | **C2** SHA-tagged images | CRITICAL | eng | **DONE - verified live** |
+| 4 | **H1** Re-apply IAM policy to both roles | HIGH | owner | **OPEN - owner action** |
+| 5 | **H3** Credential-rollback privilege escalation | HIGH | eng | **DONE - verified live** |
+| 6 | **H4** Surface and alert on quarantine | HIGH | eng | **DONE** |
+| 7 | **H2** Empty states honest across 14 files | HIGH | eng | **PARTLY DONE** - 9 of 51 |
+| 8 | **M1** `SUPABASE_SERVICE_ROLE_KEY` on `reports` | MEDIUM | owner | **OPEN - owner action** |
+| 9 | **M2** Degradation on the success path | MEDIUM | eng | **DONE** |
+| 10 | **M3** Cost sync refreshes capability row | MEDIUM | eng | **DONE** |
+| 11 | **M4** S3 45-bucket cap | MEDIUM | eng | **DONE** |
+| 12 | **M5** Surface unexplained degraded types | MEDIUM | eng | **DONE** |
+| 13 | **L1** Pin Actions to SHAs | LOW | eng | **DONE** |
+| 14 | **L2** Confirm placeholder account id unreachable | LOW | eng | **DONE - and hardened** |
+| - | Enable Cost Explorer on `354307071074` | - | owner | open |
+| - | MFA for 7 human IAM identities | - | owner | open |
+| - | Merge connector-aws#37, supabase#14 | - | owner | open |
+
+### C3 - verified in production, and this audit's own figure corrected
+
+The estate is **4 S3 buckets, not 48**. 48 was the QUARANTINE ROW count - 4
+distinct buckets re-quarantined across 12 runs over 9 days. Verified by
+distinct resource id: `cf-templates-1v9scb27fl100-ap-south-1`, `code-version`,
+`elasticbeanstalk-ap-south-1-354307071074`, `nginx-ci`.
+
+This audit inferred the `GetBucketLocation` failure cause without reproducing
+it. Production answered once buckets started landing: **HTTP 400**, not the 403
+or 301 the first fix was designed around. A bucket outside us-east-1 reached
+through the legacy global endpoint and signed for us-east-1 is refused with
+`AuthorizationHeaderMalformed` - and that refusal names the region in a
+`<Region>` element. The answer to the question was inside the error saying the
+question had been asked wrongly.
+
+| measure | before | after |
+|---|---|---|
+| `s3_bucket` rows in inventory | 0 | **4** |
+| buckets carrying a real region | 0 | **4** (all `ap-south-1`) |
+| `INVALID_REGION` quarantines accruing | every run | **0 since deploy** |
+
+The structural fix matters more than the parse: every region the scanner can
+emit now passes through the SAME `isValidRegionFormat` predicate admission uses
+to quarantine, so the scanner can no longer emit a region admission would
+refuse. The contradiction that caused this is now impossible rather than merely
+fixed.
+
+### C1 - what is done, and what is not
+
+**Done:** an email notification channel, three alert policies (Cloud Run 5xx,
+Cloud Scheduler job failure, uptime-check failure) and two uptime checks
+(app + connector-aws), all created from zero. The 5xx policy is exactly the
+signal that would have caught the six-day cost-sync outage on day one - the 503
+request logs that prove it are still in the project's history.
+
+**Found while building it:** `scheduled-scan-trivy` has been failing every hour
+since at least 2026-08-28 - roughly 600 consecutive silent failures. Its target
+returns HTTP 400. It is V2 scanner-platform work, out of AWS V1 scope, and is
+excluded from the scheduler policy by name so the policy is actionable on day
+one rather than firing hourly on a known condition. The exclusion is written
+into the policy's own documentation, not hidden.
+
+**Not done - blocked:** `ALERTS_API_URL` on `connector-aws`, and
+`POST_SCAN_HOOK_SECRET` + `SUPABASE_SERVICE_ROLE_KEY` on `observability`. The
+route is `observability`'s `/internal/evaluate-alert-rules`, NOT `automation` as
+this audit stated. It returns an honest 503 today. Copying the secrets was
+refused by the environment's permission classifier; it needs the owner.
+`ALERTS_API_URL` is deliberately left unset until then - setting it first would
+turn an honest "not configured" into a hook that fails on every scan.
+
+**The two empty rules:** not deleted. They are a customer's data. Instead they
+now render as **"never fires"** with the reason, and "Evaluate Now" reports how
+many rules could not be evaluated - it previously answered "2 rules evaluated -
+no new matches", a clean bill of health from a run that evaluated nothing.
+
+### H2 - 9 of 51
+
+`describeEmptyState` now turns capability availability and scan completeness
+into the sentence, and EksConsole - the file this audit named worst - is
+converted. **42 empty states across 13 other files still render from array
+length.** The mechanism exists and is tested; each remaining page needs its own
+evidence wired through, which is real work per page rather than a sweep.
+
+### Beyond the worklist - two defects found while fixing it
+
+**Finding resolution was ungated.** `runFinalize` marked open security findings
+`resolved` from a hardcoded list of six sources on every run, with no check that
+those scanners had run. A GuardDuty step denied by IAM, throttled, never reached
+by the slice budget, or simply absent from the plan still closed every open
+GuardDuty finding. Finding scanners also had no failure sink at all, so a denied
+call left no trace anywhere. Both fixed: a source must now be planned, run in
+every region, and commit `succeeded` before absence is believed. Production
+impact today is zero rows - all 4,075 open findings are V2-sourced - so this
+closes the trap before V1 posture findings start arriving.
+
+**Validation never checked the account binding.** STS's account id was recorded
+as `identity_account_id` and never compared to the connection's
+`aws_account_id`, which is the root cause behind L2's 10 mismatch quarantines.
+Now compared, with three states: matched, mismatched, and *unverified* - the
+last reported as itself rather than as a pass.
 
 ---
 
@@ -193,6 +276,19 @@ Current run: **32 degraded types, 23 reasons** — 9 unexplained, with nothing m
 
 - The collection run was still in flight (1080/1628) at the time of writing. Degraded counts are a stabilised trend, not a final figure.
 - Post-authentication API behaviour was verified via the integration suite, not by direct probe — no production credential was used.
-- `GetBucketLocation`'s failure cause (C3) was inferred from the quarantine evidence and the code path; it was not reproduced against AWS.
+- `GetBucketLocation`'s failure cause (C3) was inferred from the quarantine evidence and the code path; it was not reproduced against AWS. **Resolved 2026-09-22:** reproduced in production, and the inference was wrong - see section 7.
 
-**AWS is not production-ready. No certification is claimed.**
+### Post-remediation caveats (2026-09-22)
+
+- The alert policies are configured and enabled but have **not been fired in
+  anger**. This audit's own verification standard asks for "disable a scheduler
+  job -> alert fires within its window"; that test has not been run.
+- Authenticated UI flows remain unverified - no test credential exists, and the
+  standing action is to rotate the one previously shared.
+- H2 is 9 of 51. H1 and M1 are owner actions and untouched. C1's hook wiring is
+  blocked on secret propagation.
+
+**AWS is not yet production-ready, and no certification is claimed.** Every
+CRITICAL is now either closed and verified or explicitly blocked on an owner
+action, but two HIGH items (H1, H2) remain open and the alerting built for C1
+has not yet been proven by firing.
