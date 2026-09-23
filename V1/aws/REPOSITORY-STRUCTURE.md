@@ -1,0 +1,2164 @@
+# HorizonVigil — complete repository structure
+
+Every git-tracked file in every repository. Generated from `git ls-files`, so
+it reflects what is actually committed — `node_modules/`, `dist/` and other
+ignored output are excluded by definition, not by a filter that might drift.
+
+Regenerate: `python scratchpad/gen_tree.py`
+
+## Repository index
+
+| repository | tracked files | role |
+|---|---:|---|
+| `horizonvigil-admin` | 41 | Users, orgs, settings |
+| `horizonvigil-ai-gateway` | 15 | AI gateway |
+| `horizonvigil-automation` | 25 | Runbooks, webhooks, scheduled jobs |
+| `horizonvigil-billing` | 30 | Subscription, usage metering |
+| `horizonvigil-connector-aws` | 292 | AWS collection, cost, posture — the AWS service |
+| `horizonvigil-connector-azure` | 59 | Azure collection |
+| `horizonvigil-connector-gcp` | 72 | GCP collection |
+| `horizonvigil-cost` | 65 | Cost analytics, recommendations, anomalies |
+| `horizonvigil-frontend` | 325 | React/Vite SPA — every customer-facing screen |
+| `horizonvigil-incidents` | 14 | Incidents (V2 / decommissioned) |
+| `horizonvigil-llm` | 1 | LLM service |
+| `horizonvigil-observability` | 30 | Alerts, alert rules, monitoring |
+| `horizonvigil-platform-admin` | 32 | Internal platform administration |
+| `horizonvigil-platform-health` | 15 | Platform health checks |
+| `horizonvigil-reports` | 32 | Reports, exports, overview, dashboards |
+| `horizonvigil-resources` | 37 | Inventory, ownership, explorer aggregates |
+| `horizonvigil-roadmap` | 142 | Specs, audits, certification records |
+| `horizonvigil-scanner-checkov` | 11 | scanner microservice (V2) |
+| `horizonvigil-scanner-dependency-check` | 12 | scanner microservice (V2) |
+| `horizonvigil-scanner-gitleaks` | 12 | scanner microservice (V2) |
+| `horizonvigil-scanner-grype` | 12 | scanner microservice (V2) |
+| `horizonvigil-scanner-kube-bench` | 1 | scanner microservice (V2) |
+| `horizonvigil-scanner-kubescape` | 1 | scanner microservice (V2) |
+| `horizonvigil-scanner-nuclei` | 12 | scanner microservice (V2) |
+| `horizonvigil-scanner-prowler` | 12 | scanner microservice (V2) |
+| `horizonvigil-scanner-semgrep` | 12 | scanner microservice (V2) |
+| `horizonvigil-scanner-shared-lib` | 19 | scanner microservice (V2) |
+| `horizonvigil-scanner-syft` | 11 | scanner microservice (V2) |
+| `horizonvigil-scanner-trivy` | 12 | scanner microservice (V2) |
+| `horizonvigil-scanner-trufflehog` | 11 | scanner microservice (V2) |
+| `horizonvigil-security` | 37 | Cloud security / posture APIs, V2 entitlement gate |
+| `horizonvigil-shared-lib` | 44 | Cross-service auth, RBAC, db, pagination, availability contract |
+| `horizonvigil-trivy` | 14 | Trivy scanner service (V2) |
+| `supabase` | 157 | Postgres migrations — the schema of record |
+| **total** | **1617** | |
+
+---
+
+## `horizonvigil-admin` — 41 files
+
+```
+horizonvigil-admin/
+  .github/
+    workflows/
+      ci.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      email.ts
+    orgManagement/
+      routes/
+        audit-log.ts
+        business-units.ts
+        cost-centers.ts
+        folders.ts
+        insights.ts
+        organizations.ts
+        projects.ts
+      types/
+        index.ts
+    server.ts
+    settings/
+      lib/
+        roles.ts
+      routes/
+        aws-integrations.ts
+        billing.ts
+        credentials.ts
+        org-settings.ts
+        rbac.ts
+    users/
+      lib/
+        crypto.ts
+        roles.ts
+      routes/
+        abacPolicies.ts
+        api-keys.ts
+        audit-logs.ts
+        groups.ts
+        members.ts
+        menuPermissions.ts
+        resourceGrants.ts
+        roles.ts
+        scim.ts
+        scimTokens.ts
+      types/
+        index.ts
+  tsconfig.json
+```
+
+## `horizonvigil-ai-gateway` — 15 files
+
+```
+horizonvigil-ai-gateway/
+  .github/
+    workflows/
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      context.ts
+      llm.ts
+    routes/
+      chat.ts
+      conversations.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-automation` — 25 files
+
+```
+horizonvigil-automation/
+  .github/
+    workflows/
+      deploy.yml
+      security-checks.yml
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      crypto.ts
+      dispatch.ts
+      jira.ts
+      safeFetch.ts
+      webhookSigning.ts
+    routes/
+      dispatch.ts
+      executions.ts
+      integrations.ts
+      jira.ts
+      runbooks.ts
+      scheduled-jobs.ts
+      webhooks.ts
+      workflows.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-billing` — 30 files
+
+```
+horizonvigil-billing/
+  .github/
+    workflows/
+      deploy.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      authDb.ts
+      capabilities.ts
+      mockProvider.ts
+      paymentProvider.ts
+      razorpayProvider.ts
+      stripeProvider.test.ts
+      stripeProvider.ts
+    routes/
+      admin.ts
+      coupons.test.ts
+      coupons.ts
+      invoices.ts
+      plans.ts
+      referrals.ts
+      subscriptions.ts
+      usage.ts
+      webhooks.test.ts
+      webhooks.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-connector-aws` — 292 files
+
+```
+horizonvigil-connector-aws/
+  .github/
+    workflows/
+      deploy.yml
+      integration-tests.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  Jenkinsfile
+  README.md
+  RELEASE.md
+  cloudbuild.yaml
+  docs/
+    adr/
+      0001-durable-collection-jobs-on-cloud-run.md
+    phase1-certification.md
+    phase2-architecture.md
+    phase2-certification.md
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    indexContract.test.ts
+    integration/
+      harness.ts
+      lineage.integration.test.ts
+      tenantIsolation.integration.test.ts
+    lib/
+      accountBinding.test.ts
+      accountBinding.ts
+      adapterContract.test.ts
+      adapterContract.ts
+      admission.test.ts
+      admission.ts
+      arnResourceLookup.ts
+      assumeRole.test.ts
+      assumeRole.ts
+      awsApi.test.ts
+      awsApi.ts
+      awsErrors.test.ts
+      awsErrors.ts
+      capabilities.ts
+      capabilityFreshness.test.ts
+      capabilityFreshness.ts
+      capabilityMatrix.test.ts
+      capabilityMatrix.ts
+      capabilityRegistry.test.ts
+      capabilityRegistry.ts
+      capabilityStatus.test.ts
+      capabilityStatus.ts
+      capabilityVocabulary.test.ts
+      ceRecommendations.test.ts
+      ceRecommendations.ts
+      changeImpact.test.ts
+      changeImpact.ts
+      changeProvenance.test.ts
+      changeProvenance.ts
+      collectionRuns.test.ts
+      collectionRuns.ts
+      costFacts.test.ts
+      costFacts.ts
+      costSourceState.test.ts
+      costSourceState.ts
+      credentialRotation.test.ts
+      credentialRotation.ts
+      credentialRpcAuthorization.test.ts
+      crypto.ts
+      curIngest.test.ts
+      curIngest.ts
+      curWorkflow.test.ts
+      curWorkflow.ts
+      deployImmutability.test.ts
+      discoveryFinalize.test.ts
+      discoveryFinalize.ts
+      edgeMaterialization.ts
+      edgeVocabulary.test.ts
+      edgeVocabulary.ts
+      evidenceContract.test.ts
+      evidenceContract.ts
+      exclusions.ts
+      findingCoverage.test.ts
+      findingCoverage.ts
+      generations.test.ts
+      generations.ts
+      health.test.ts
+      health.ts
+      iamPrivilegeAnalysis.ts
+      ingestion.ts
+      inventoryReconciliation.test.ts
+      inventoryReconciliation.ts
+      k8sCostAllocation.test.ts
+      k8sCostAllocation.ts
+      k8sQuantity.test.ts
+      k8sQuantity.ts
+      lineage.ts
+      lineageReconciliation.test.ts
+      lineageReconciliation.ts
+      networkTopology.test.ts
+      networkTopology.ts
+      notify.ts
+      pagedSelect.test.ts
+      pagedSelect.ts
+      pagination.test.ts
+      pagination.ts
+      paginationSignals.ts
+      permissionChecks.ts
+      permissionProbesExtra.test.ts
+      permissionProbesExtra.ts
+      postScanHooks.test.ts
+      postScanHooks.ts
+      reconcileRunLineage.ts
+      reconcileRunLineagePaging.test.ts
+      redactAws.ts
+      regionCatalog.test.ts
+      regionCatalog.ts
+      regionalAvailability.test.ts
+      regionalAvailability.ts
+      remediationActions.ts
+      remediationEligibility.test.ts
+      remediationEligibility.ts
+      retryScheduling.test.ts
+      scanHealth.test.ts
+      scanHealth.ts
+      scanners/
+        accessAnalyzerFindings.ts
+        accessanalyzer.ts
+        acm.ts
+        acmpca.ts
+        apigateway.ts
+        appmesh.ts
+        apprunner.ts
+        appsync.ts
+        athena.ts
+        autoscaling.ts
+        awsConfigFindings.ts
+        backup.ts
+        batch.ts
+        budgets.ts
+        ce.ts
+        cloudformation.ts
+        cloudfront.ts
+        cloudhsm.ts
+        cloudtrail.test.ts
+        cloudtrail.ts
+        cloudwatch.ts
+        codeartifact.ts
+        codebuild.ts
+        codecommit.ts
+        codedeploy.ts
+        codepipeline.ts
+        cognito.ts
+        computeoptimizer.ts
+        config.ts
+        controltower.ts
+        datasync.ts
+        detective.ts
+        directconnect.ts
+        directoryservice.ts
+        dms.ts
+        docdb.ts
+        drs.ts
+        dynamodb.ts
+        ec2.test.ts
+        ec2.ts
+        ec2Metrics.ts
+        ecr.ts
+        ecs.ts
+        efs.ts
+        eks.ts
+        eksWorkloads.ts
+        elasticache.ts
+        elasticbeanstalk.ts
+        elb.ts
+        emr.ts
+        es.ts
+        events.ts
+        findingTypes.ts
+        firehose.ts
+        fms.ts
+        fsx.ts
+        glacier.ts
+        globalaccelerator.ts
+        glue.ts
+        guardduty.ts
+        guarddutyFindings.ts
+        health.ts
+        iam.ts
+        iamFailureSemantics.test.ts
+        identityAssertions.test.ts
+        imagebuilder.ts
+        inspector2.ts
+        inspectorFindings.ts
+        kafka.ts
+        kinesis.ts
+        kms.ts
+        lakeformation.ts
+        lambda.ts
+        licensemanager.ts
+        lightsail.ts
+        macie.ts
+        memorydb.ts
+        metricTypes.ts
+        mq.ts
+        neptune.ts
+        networkfirewall.ts
+        organizations.test.ts
+        organizations.ts
+        outposts.ts
+        ram.ts
+        rds.ts
+        redshift.ts
+        redshiftserverless.ts
+        resiliencehub.ts
+        resourcegroups.ts
+        route53.ts
+        route53resolver.ts
+        s3.test.ts
+        s3.ts
+        s3control.test.ts
+        s3control.ts
+        sagemaker.ts
+        savingsplans.ts
+        secretsmanager.ts
+        securityGroupRules.test.ts
+        securityGroupRules.ts
+        securityhub.ts
+        securityhubFindings.ts
+        servicecatalog.ts
+        servicediscovery.ts
+        ses.ts
+        shield.ts
+        snowball.ts
+        sns.ts
+        sqs.ts
+        ssm.ts
+        states.ts
+        storagegateway.ts
+        timestream.ts
+        trustedAdvisorFindings.ts
+        trustedAdvisorResource.ts
+        types.ts
+        waf.ts
+        wellarchitected.ts
+        workspaces.ts
+      scheduleCadence.test.ts
+      scheduleCadence.ts
+      truncationGuard.test.ts
+      xmlList.test.ts
+      xmlList.ts
+    routes/
+      accounts.ts
+      accountsScope.test.ts
+      activity.ts
+      adapterManifest.ts
+      bulkImport.ts
+      capabilities.ts
+      capabilityWritePath.test.ts
+      cloudtrailChanges.test.ts
+      cloudtrailEvents.test.ts
+      cloudtrailEvents.ts
+      collectionRuns.ts
+      connectionConcurrency.test.ts
+      cost.test.ts
+      cost.ts
+      costReadiness.test.ts
+      costReadiness.ts
+      cur.ts
+      dashboard.ts
+      dashboardAssetCount.test.ts
+      dashboardResilience.test.ts
+      disconnectImpact.test.ts
+      disconnectImpact.ts
+      discovery.ts
+      evidence.ts
+      health.ts
+      identities.ts
+      internalChangeSync.ts
+      internalRegistryToken.ts
+      internalScan.ts
+      k8sCost.ts
+      lineage.ts
+      lineageRunLink.test.ts
+      lineageWritePath.test.ts
+      logs.ts
+      organizations.ts
+      permissions.ts
+      phase1Containment.test.ts
+      recommendations.ts
+      recommendationsSync.ts
+      regionCatalog.ts
+      regions.ts
+      remediation.ts
+      reports.ts
+      scheduledDurable.test.ts
+      workerEndpoints.test.ts
+    server.ts
+  templates/
+    horizonvigil-scan-role-stackset.yaml
+  tsconfig.json
+  vitest.config.ts
+  vitest.integration.config.ts
+```
+
+## `horizonvigil-connector-azure` — 59 files
+
+```
+horizonvigil-connector-azure/
+  .github/
+    workflows/
+      deploy.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  Jenkinsfile
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      azureApi.ts
+      azureAuth.ts
+      azureCredentials.ts
+      capabilities.ts
+      crypto.ts
+      discoveryFinalize.ts
+      health.test.ts
+      health.ts
+      permissionChecks.ts
+      postScanHooks.ts
+      scanners/
+        aks.ts
+        appService.ts
+        applicationGateways.ts
+        containerRegistry.ts
+        cosmosDb.ts
+        defenderFindings.ts
+        dnsZones.ts
+        eventHub.ts
+        keyVault.ts
+        loadBalancers.ts
+        logAnalytics.ts
+        managedDisks.ts
+        managedIdentities.ts
+        networkInterfaces.ts
+        networkSecurityGroups.ts
+        publicIps.ts
+        redisCache.ts
+        roleAssignments.ts
+        serviceBus.ts
+        sqlDatabases.ts
+        storageAccounts.ts
+        types.ts
+        virtualMachines.ts
+        virtualNetworks.ts
+    routes/
+      accounts.ts
+      accountsScope.test.ts
+      activity.ts
+      bulkImport.ts
+      changes.ts
+      cost.test.ts
+      cost.ts
+      dashboard.ts
+      discovery.ts
+      health.ts
+      hierarchy.ts
+      permissions.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-connector-gcp` — 72 files
+
+```
+horizonvigil-connector-gcp/
+  .github/
+    workflows/
+      deploy.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  Dockerfile.deploy
+  Jenkinsfile
+  README.md
+  cloudbuild.yaml
+  cloudops-shared-lib
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      capabilities.ts
+      crypto.test.ts
+      crypto.ts
+      discoveryFinalize.ts
+      gcpApi.ts
+      gcpAuth.ts
+      gcpBilling.test.ts
+      gcpBilling.ts
+      gcpCredentials.ts
+      gcpRemediation.ts
+      gcpRemediationEligibility.test.ts
+      gcpRemediationEligibility.ts
+      gcpResourceLookup.ts
+      health.test.ts
+      health.ts
+      permissionChecks.ts
+      postScanHooks.ts
+      scanners/
+        artifactregistry.ts
+        bigquery.ts
+        cloudbuild.ts
+        cloudrun.ts
+        cloudsql.ts
+        compute.ts
+        dns.ts
+        filestore.ts
+        firestore.ts
+        functions.ts
+        gke.ts
+        gkeWorkloads.ts
+        iam.ts
+        kms.ts
+        loadbalancing.ts
+        memorystore.ts
+        network.ts
+        pubsub.ts
+        secretmanager.ts
+        securityCommandCenterFindings.ts
+        spanner.ts
+        storage.ts
+        types.ts
+    routes/
+      accounts.ts
+      accountsScope.test.ts
+      activity.ts
+      billing.test.ts
+      billing.ts
+      bulkImport.ts
+      changes.ts
+      dashboard.ts
+      discovery.ts
+      health.ts
+      hierarchy.ts
+      internalRegistryToken.ts
+      internalScan.ts
+      permissions.ts
+      remediation.ts
+    server.ts
+  tsconfig.json
+  vitest.config.ts
+```
+
+## `horizonvigil-cost` — 65 files
+
+```
+horizonvigil-cost/
+  .github/
+    workflows/
+      ci.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    integration/
+      costEvidence.integration.test.ts
+      harness.ts
+    lib/
+      anomalyDetection.test.ts
+      anomalyDetection.ts
+      costAvailability.test.ts
+      costAvailability.ts
+      dateRange.ts
+      detectAnomalies.ts
+      ec2Sizing.test.ts
+      ec2Sizing.ts
+      email.ts
+      exclusions.ts
+      fx.test.ts
+      fx.ts
+      generateRecommendations.test.ts
+      generateRecommendations.ts
+      github.ts
+      money.test.ts
+      money.ts
+      notify.ts
+      recommendationValidity.test.ts
+      recommendationValidity.ts
+      reconciliation.test.ts
+      reconciliation.ts
+      reevaluateRecommendations.test.ts
+      reevaluateRecommendations.ts
+      rules.ts
+      scope.test.ts
+      scope.ts
+    routes/
+      allocation.ts
+      analytics.ts
+      anomalies.ts
+      budgets.ts
+      costEvidence.ts
+      costSourceStatus.ts
+      dashboard.ts
+      explorer.ts
+      forecast.ts
+      fx.ts
+      git.ts
+      internal.ts
+      recommendations.ts
+      reports.ts
+      resourceCosts.ts
+    server.ts
+    services/
+      allocation.ts
+      budgets.test.ts
+      budgets.ts
+      forecast.ts
+      resourceCosts.test.ts
+      resourceCosts.ts
+  tsconfig.json
+  vitest.config.ts
+  vitest.integration.config.ts
+```
+
+## `horizonvigil-frontend` — 325 files
+
+```
+horizonvigil-frontend/
+  .env.development
+  .env.example
+  .env.production
+  .env.test
+  .github/
+    workflows/
+      deploy.yml
+      security-checks.yml
+      smoke-test.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  e2e/
+    auth.setup.ts
+    public.spec.ts
+    responsive.spec.ts
+    smoke.spec.ts
+    tsconfig.json
+  eslint.config.js
+  index.html
+  package-lock.json
+  package.json
+  playwright.config.ts
+  postcss.config.js
+  public/
+    logos/
+      aws.png
+      azure.png
+      gcp.png
+    og-image.png
+    robots.txt
+    serve.json
+    sitemap.xml
+    theme-init.js
+  src/
+    App.tsx
+    api/
+      client.ts
+      queryClient.ts
+      users.api.ts
+    assets/
+      brand/
+        horizonvigil-icon.svg
+        horizonvigil-logo-dark.svg
+        horizonvigil-logo-light.svg
+        horizonvigil-stacked-compact.svg
+        horizonvigil-stacked-square.svg
+    components/
+      AccessDenied.tsx
+      AddAccountChooser.tsx
+      AppRail.tsx
+      Badge.tsx
+      Breadcrumb.tsx
+      ChatWidget.tsx
+      CommandPalette.tsx
+      ConfirmDialog.tsx
+      ConnectAwsAccountWizard.tsx
+      ConnectAzureSubscriptionWizard.tsx
+      ConnectGcpProjectWizard.tsx
+      CreateIncidentModal.tsx
+      DataTable.tsx
+      DemoDataBanner.tsx
+      Drawer.tsx
+      EditAccountModal.tsx
+      EmptyState.tsx
+      ErrorBoundary.tsx
+      FilterBar.tsx
+      Layout.tsx
+      MenuAccessTree.tsx
+      MfaSettings.tsx
+      Modal.tsx
+      ProtectedRoute.tsx
+      ResourceFilterBar.tsx
+      ScanCategoryCard.tsx
+      ScanHistoryTable.tsx
+      ScopePicker.tsx
+      SecurityPostureSummary.tsx
+      Skeleton.tsx
+      SourceInventoryFilters.tsx
+      StatCard.tsx
+      TopBar.tsx
+      WorkspaceBreadcrumb.tsx
+      accessibility.test.tsx
+      accessibilityInteractive.test.tsx
+      charts/
+        BarChart.tsx
+        Donut.tsx
+        LineChart.tsx
+        StackedBar.tsx
+        palette.ts
+      cloudAccounts/
+        AccessMatrix.tsx
+        AccountHealthTab.tsx
+        ActivityPanel.tsx
+        BulkOnboardingModal.tsx
+        ChangesPanel.tsx
+        ConnectionsPanel.tsx
+        HealthPanel.tsx
+        HierarchyPanel.tsx
+        OverviewPanel.tsx
+        ProviderChips.tsx
+        ScanCoverageBanner.tsx
+        changeProvenance.test.ts
+        overview/
+          ActivityTimeline.tsx
+          AttentionRequired.tsx
+          CostPanel.tsx
+          DistributionPanel.tsx
+          HealthPanels.tsx
+          InfraPanels.tsx
+          OverviewFilters.tsx
+          ProviderCards.tsx
+          ProviderMark.tsx
+          ResourceDistribution.tsx
+          ResourceGrowth.tsx
+          ResourcePanels.tsx
+          SecurityPanel.tsx
+          SyncPanel.tsx
+          TopProblemAccounts.tsx
+          primitives.tsx
+          securityPanelHooks.test.tsx
+        scanCoverageBanner.test.tsx
+      cloudCompliance/
+        RunEvaluation.tsx
+        runEvaluation.test.tsx
+      cloudSecurity/
+        CredentialRiskCell.tsx
+        DerivedPostureChecks.tsx
+        credentialRiskCell.test.tsx
+        derivedPostureChecks.test.tsx
+      evidence/
+        EvidenceEmptyState.tsx
+        emptyState.test.ts
+        emptyState.ts
+      finops/
+        FinOpsOverviewTab.tsx
+        finopsPanels.tsx
+      guardFailClosed.test.ts
+      icons.tsx
+      k8s/
+        DetailPrimitives.tsx
+      marketing/
+        Logo.tsx
+        MarketingFooter.tsx
+        MarketingNav.tsx
+      overview/
+        AddWidgetsDrawer.tsx
+        CustomizeBar.tsx
+        OverviewGrid.tsx
+        SignalCenter.tsx
+        WhyDrawer.tsx
+        WidgetFrame.tsx
+        registry.tsx
+        widgets/
+          devopsWidgets.tsx
+          finopsWidgets.tsx
+          observabilityWidgets.tsx
+          operationsWidgets.tsx
+          platformWidgets.tsx
+          securityWidgets.tsx
+          shared.tsx
+      resources/
+        OwnershipPanel.tsx
+        ownershipPanel.test.tsx
+      vulnOverview/
+        ClickableStatCard.tsx
+        CriticalNow.tsx
+        FindingsByScanType.tsx
+        KpiRow.tsx
+        RiskSummary.tsx
+        ScanCategorySummary.tsx
+        ScanCoverage.tsx
+        ScanHealth.tsx
+    hooks/
+      users/
+        useAbacPolicies.ts
+        useApiKeys.ts
+        useAuditLog.ts
+        useGroups.ts
+        useMembers.ts
+        useMenuPermissions.ts
+        useResourceGrants.ts
+        useRoles.ts
+        useScimTokens.ts
+    index.css
+    lib/
+      accountDetailResilience.test.ts
+      api.ts
+      auth.tsx
+      awsRegions.test.ts
+      awsRegions.ts
+      azureRequiredPermissions.ts
+      chatMarkdown.tsx
+      cloudAccounts/
+        connections.test.ts
+        connections.ts
+        health.test.ts
+        health.ts
+        hierarchy.test.ts
+        hierarchy.ts
+        overview.test.ts
+        overview.ts
+      demoData/
+        context.tsx
+        random.ts
+        seed.ts
+        sourceInventory.ts
+      environment.ts
+      excelExport.ts
+      featureFlags.ts
+      fetchAllPages.ts
+      filterContext.tsx
+      finops/
+        fx.test.ts
+        fx.ts
+        groupFilter.test.ts
+        groupFilter.ts
+        overview.test.ts
+        overview.ts
+      format.ts
+      gcpRequiredPermissions.ts
+      globalSearch.ts
+      leastPrivilegePolicy.test.ts
+      leastPrivilegePolicy.ts
+      lifecycleActions.test.ts
+      marketingContent.ts
+      mfa.ts
+      navConfig.test.ts
+      navConfig.ts
+      orgContext.tsx
+      overview/
+        capabilities.test.ts
+        capabilities.ts
+        contextSignals.ts
+        engine.test.ts
+        engine.ts
+        modules.test.ts
+        modules.ts
+        preferences.test.ts
+        preferences.ts
+        registryMeta.test.ts
+        registryMeta.ts
+        scope.ts
+        scopeLogic.test.ts
+        scopeLogic.ts
+        types.ts
+      phase1Containment.test.ts
+      publicClaims.test.ts
+      recommendationDisplay.test.ts
+      recommendationDisplay.ts
+      reportSnapshots.test.ts
+      safeUrl.test.ts
+      safeUrl.ts
+      scope.test.ts
+      scope.ts
+      scopeIsolation.test.ts
+      scrollToSection.ts
+      sourceInventoryClouds.ts
+      sourceInventoryRepos.ts
+      supabase.ts
+      syncContext.behavior.test.tsx
+      syncContext.tsx
+      tablePreferences.test.ts
+      tablePreferences.ts
+      theme.tsx
+      toast.tsx
+      truthContracts.test.ts
+      unifiedAccounts.ts
+      useCanSeeSubmenu.ts
+      useFocusTrap.ts
+      useMenuPermission.ts
+      useResourceFilters.ts
+      useResourcesUrlFilters.ts
+      useTabParam.ts
+      v2Isolation.test.ts
+    main.tsx
+    pages/
+      AiCopilot.tsx
+      AksConsole.tsx
+      Alerts.tsx
+      ApplicationSecurity.tsx
+      Automation.tsx
+      AwsAccountDetail.tsx
+      AzureAccountDetail.tsx
+      BillingCanceled.tsx
+      BillingSuccess.tsx
+      CloudAccountDetail.tsx
+      CloudAccounts.tsx
+      CloudCompliance.tsx
+      CloudSecurity.tsx
+      CodeSecurity.tsx
+      ContainerKubernetesSecurity.tsx
+      CostManagement.tsx
+      CostOptimization.tsx
+      CustomDashboards.tsx
+      EksConsole.tsx
+      FinOps.tsx
+      GcpProjectDetail.tsx
+      GkeConsole.tsx
+      IncidentDetail.tsx
+      Incidents.tsx
+      InfrastructureSecurity.tsx
+      Issues.tsx
+      MockCheckout.tsx
+      Monitoring.tsx
+      OrganizationManagement.tsx
+      Overview.tsx
+      Reports.tsx
+      Resources.tsx
+      SecurityScanningCenter.tsx
+      Settings.tsx
+      SourceAssetDetail.tsx
+      SourceInventoryCategory.tsx
+      Subscription.tsx
+      UsersGroups.tsx
+      VulnerabilityDetail.tsx
+      VulnerabilityManagement.tsx
+      alerts/
+        describeEvaluation.test.ts
+        describeEvaluation.ts
+      auth/
+        AcceptInvite.tsx
+        AuthLayout.tsx
+        ForgotPassword.tsx
+        Login.tsx
+        MfaChallenge.tsx
+        RequireAuth.tsx
+        ResetPassword.tsx
+        Signup.tsx
+      marketing/
+        Docs.tsx
+        Home.test.tsx
+        Home.tsx
+        LegalPage.tsx
+        NotFound.tsx
+        Pricing.tsx
+        PrivacyPolicy.tsx
+        TermsOfService.tsx
+      resources/
+        ResourcesCategory.tsx
+        ResourcesOverview.tsx
+      sourceInventory/
+        RealCloudAssetDetail.tsx
+        RealCloudInventory.tsx
+        RealRepositoryAssetDetail.tsx
+        RealRepositoryInventory.tsx
+      vulnerabilityManagementModule.test.tsx
+    routes/
+      lazyRoutes.manifest.ts
+      lazyRoutes.test.ts
+      lazyRoutes.ts
+    test/
+      a11y.ts
+      authE2eGate.test.ts
+      setup.ts
+      sourceCode.ts
+    types/
+      user.ts
+    vite-env.d.ts
+  tailwind.config.js
+  tsconfig.json
+  tsconfig.node.json
+  vite.config.ts
+  vitest.config.ts
+```
+
+## `horizonvigil-incidents` — 14 files
+
+```
+horizonvigil-incidents/
+  .github/
+    workflows/
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      notify.ts
+      safeFetch.ts
+    routes/
+      incidents.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-llm` — 1 files
+
+```
+horizonvigil-llm/
+  Dockerfile
+```
+
+## `horizonvigil-observability` — 30 files
+
+```
+horizonvigil-observability/
+  .github/
+    workflows/
+      deploy.yml
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    alerts/
+      routes/
+        alerts.ts
+        channels.ts
+        escalation-policies.ts
+        evaluate.ts
+        internal.ts
+        maintenance-windows.ts
+        rules.ts
+      ruleEvaluability.test.ts
+      ruleEvaluability.ts
+    env.ts
+    index.ts
+    lib/
+      notify.ts
+      pagedSelect.ts
+      safeFetch.ts
+    monitoring/
+      routes/
+        alarms.ts
+        dashboard.ts
+        deployments.ts
+        health.ts
+        metrics.ts
+        not-integrated.ts
+    server.ts
+  tsconfig.json
+  vitest.config.ts
+```
+
+## `horizonvigil-platform-admin` — 32 files
+
+```
+horizonvigil-platform-admin/
+  .env.production
+  .github/
+    workflows/
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  cloudbuild.yaml
+  index.html
+  package-lock.json
+  package.json
+  postcss.config.js
+  public/
+    serve.json
+    theme-init.js
+  src/
+    App.tsx
+    components/
+      Badge.tsx
+      DataTable.tsx
+      Drawer.tsx
+      StatCard.tsx
+      charts/
+        palette.ts
+      icons.tsx
+    index.css
+    lib/
+      api.ts
+      supabase.ts
+      theme.tsx
+      toast.tsx
+      types.ts
+    main.tsx
+    pages/
+      Dashboard.tsx
+    vite-env.d.ts
+  tailwind.config.js
+  tsconfig.json
+  tsconfig.node.json
+  vite.config.ts
+```
+
+## `horizonvigil-platform-health` — 15 files
+
+```
+horizonvigil-platform-health/
+  .github/
+    workflows/
+      deploy.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      healthCheck.ts
+    routes/
+      check.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-reports` — 32 files
+
+```
+horizonvigil-reports/
+  .github/
+    workflows/
+      deploy.yml
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      artifactManifest.test.ts
+      capabilities.ts
+      exclusions.ts
+      generate.test.ts
+      generate.ts
+      snapshot.test.ts
+      snapshot.ts
+    routes/
+      activity.ts
+      activityScope.test.ts
+      dashboard.ts
+      dashboards.ts
+      export-center.ts
+      favorites.ts
+      quick-actions.ts
+      reports.ts
+      scheduled.ts
+      templates.ts
+      v2ReportGating.test.ts
+      widget-library.ts
+    server.ts
+    services/
+      aggregate.ts
+  tsconfig.json
+  vitest.config.ts
+```
+
+## `horizonvigil-resources` — 37 files
+
+```
+horizonvigil-resources/
+  .github/
+    workflows/
+      ci.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    containers/
+      routes/
+        dashboard.ts
+        ecs.ts
+        eks.ts
+        gcp.ts
+      services/
+        catalog.ts
+        resources.ts
+    env.ts
+    index.ts
+    lib/
+      entityClass.test.ts
+      entityClass.ts
+      ownership.test.ts
+      ownership.ts
+    resources/
+      canonicalType.test.ts
+      routes/
+        bulk.ts
+        catalog.ts
+        dashboard.ts
+        explorer.ts
+        inventory.ts
+        inventoryCursor.test.ts
+        ownership.ts
+        relationships.ts
+        search.ts
+        tags.ts
+        timeline.ts
+      services/
+        inventory.ts
+        relationships.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-roadmap` — 142 files
+
+```
+horizonvigil-roadmap/
+  .gitattributes
+  CONVENTIONS.md
+  README.md
+  STATUS.md
+  V1/
+    CERTIFICATION-MATRIX.md
+    PROVIDER-PARITY.md
+    README.md
+    _delivered/
+      certification-blockers-1a-1j.md
+      containment-and-isolation.md
+      lineage-and-quarantine.md
+    aws/
+      AUDIT-2026-09-15.md
+      AWS_PHASE_STATUS.md
+      AWS_PRODUCTION_BLOCKER_MATRIX.md
+      AWS_PRODUCTION_CERTIFICATION.md
+      AWS_V1_PRODUCTION_BASELINE_AUDIT.md
+      COMPETITIVE-CLOUDEVA-2026-09-22.md
+      PHASE-MATRIX-2026-09-16.md
+      README.md
+      aws-00-architecture-and-provider-contract/
+        README.md
+      aws-01-tenant-organization-scope/
+        README.md
+      aws-02-connection/
+        README.md
+      aws-03-credential-lifecycle/
+        README.md
+      aws-04-permission-validation/
+        README.md
+      aws-05-region-and-location-discovery/
+        README.md
+      aws-06-durable-collection-jobs/
+        README.md
+      aws-07-resource-discovery/
+        README.md
+        SCANNER-COVERAGE.md
+      aws-08-canonical-inventory/
+        README.md
+      aws-09-resource-generations/
+        README.md
+      aws-10-relationships/
+        README.md
+      aws-11-lineage-and-reconciliation/
+        README.md
+      aws-12-partial-collection-safety/
+        README.md
+      aws-13-cost-primary-source/
+        README.md
+      aws-14-cost-export-ingestion/
+        README.md
+      aws-15-cost-reconciliation/
+        README.md
+      aws-16-security-posture/
+        README.md
+      aws-17-compliance/
+        README.md
+      aws-18-iam-identity/
+        README.md
+      aws-19-health-and-metrics/
+        README.md
+      aws-20-ownership-and-iac/
+        README.md
+      aws-21-optimization-recommendations/
+        README.md
+      aws-22-changes-and-activity/
+        README.md
+      aws-23-reports-and-exports/
+        README.md
+      aws-24-api-hardening/
+        README.md
+      aws-25-performance-dr-accessibility/
+        README.md
+      aws-26-end-to-end-certification/
+        README.md
+      aws-27-production-go-no-go/
+        README.md
+      iam/
+        apply-collection-policy.sh
+        horizonvigil-collection-policy.json
+    azure/
+      README.md
+      azure-00-architecture-and-provider-contract/
+        README.md
+      azure-01-tenant-organization-scope/
+        README.md
+      azure-02-connection/
+        README.md
+      azure-03-credential-lifecycle/
+        README.md
+      azure-04-permission-validation/
+        README.md
+      azure-05-region-and-location-discovery/
+        README.md
+      azure-06-durable-collection-jobs/
+        README.md
+      azure-07-resource-discovery/
+        README.md
+      azure-08-canonical-inventory/
+        README.md
+      azure-09-resource-generations/
+        README.md
+      azure-10-relationships/
+        README.md
+      azure-11-lineage-and-reconciliation/
+        README.md
+      azure-12-partial-collection-safety/
+        README.md
+      azure-13-cost-primary-source/
+        README.md
+      azure-14-cost-export-ingestion/
+        README.md
+      azure-15-cost-reconciliation/
+        README.md
+      azure-16-security-posture/
+        README.md
+      azure-17-compliance/
+        README.md
+      azure-18-iam-identity/
+        README.md
+      azure-19-health-and-metrics/
+        README.md
+      azure-20-ownership-and-iac/
+        README.md
+      azure-21-optimization-recommendations/
+        README.md
+      azure-22-changes-and-activity/
+        README.md
+      azure-23-reports-and-exports/
+        README.md
+      azure-24-api-hardening/
+        README.md
+      azure-25-performance-dr-accessibility/
+        README.md
+      azure-26-end-to-end-certification/
+        README.md
+      azure-27-production-go-no-go/
+        README.md
+    gcp/
+      README.md
+      gcp-00-architecture-and-provider-contract/
+        README.md
+      gcp-01-tenant-organization-scope/
+        README.md
+      gcp-02-connection/
+        README.md
+      gcp-03-credential-lifecycle/
+        README.md
+      gcp-04-permission-validation/
+        README.md
+      gcp-05-region-and-location-discovery/
+        README.md
+      gcp-06-durable-collection-jobs/
+        README.md
+      gcp-07-resource-discovery/
+        README.md
+      gcp-08-canonical-inventory/
+        README.md
+      gcp-09-resource-generations/
+        README.md
+      gcp-10-relationships/
+        README.md
+      gcp-11-lineage-and-reconciliation/
+        README.md
+      gcp-12-partial-collection-safety/
+        README.md
+      gcp-13-cost-primary-source/
+        README.md
+      gcp-14-cost-export-ingestion/
+        README.md
+      gcp-15-cost-reconciliation/
+        README.md
+      gcp-16-security-posture/
+        README.md
+      gcp-17-compliance/
+        README.md
+      gcp-18-iam-identity/
+        README.md
+      gcp-19-health-and-metrics/
+        README.md
+      gcp-20-ownership-and-iac/
+        README.md
+      gcp-21-optimization-recommendations/
+        README.md
+      gcp-22-changes-and-activity/
+        README.md
+      gcp-23-reports-and-exports/
+        README.md
+      gcp-24-api-hardening/
+        README.md
+      gcp-25-performance-dr-accessibility/
+        README.md
+      gcp-26-end-to-end-certification/
+        README.md
+      gcp-27-production-go-no-go/
+        README.md
+    oci/
+      README.md
+    phase-00-architecture-and-capability-registry/
+      README.md
+    phase-01-multi-cloud-connection-model/
+      README.md
+    phase-02-credentials-and-permissions/
+      README.md
+    phase-03-durable-jobs/
+      README.md
+    phase-08-canonical-inventory/
+      8.1-identity-and-generations/
+        README.md
+      8.2-location-partition-region/
+        README.md
+      8.3-relationships/
+        README.md
+      8.4-coverage-and-reconciliation/
+        README.md
+      8.5-api-and-ui-truth/
+        README.md
+      8.6-operations/
+        README.md
+      README.md
+    phase-09-multi-cloud-cost/
+      README.md
+    phase-10-security-posture/
+      README.md
+    phase-11-compliance/
+      README.md
+    phase-12-iam-identity/
+      README.md
+    phase-13-ownership-and-iac/
+      README.md
+    phase-14-health-and-evidence/
+      README.md
+    phase-15-recommendations/
+      README.md
+    phase-16-cross-cloud-optimization/
+      README.md
+    phase-17-changes-and-activity/
+      README.md
+    phase-18-reports-and-exports/
+      README.md
+    phase-19-organizations-and-bulk-onboarding/
+      README.md
+    phase-20-api-hardening/
+      README.md
+    phase-21-observability-and-sre/
+      README.md
+    phase-22-performance-and-scale/
+      README.md
+    phase-23-backup-restore-dr/
+      README.md
+    phase-24-accessibility/
+      README.md
+    phase-25-security-certification/
+      README.md
+    phase-26-end-to-end-certification/
+      README.md
+    phase-27-production-go-no-go/
+      README.md
+  V2/
+    README.md
+    phase-1-vulnerability-management/
+      README.md
+    phase-2-provider-remediation/
+      README.md
+    phase-3-scheduled-delivery/
+      README.md
+```
+
+## `horizonvigil-scanner-checkov` — 11 files
+
+```
+horizonvigil-scanner-checkov/
+  .gitignore
+  Dockerfile
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    checkovParser.ts
+    cloudRunJobs.ts
+    git.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-dependency-check` — 12 files
+
+```
+horizonvigil-scanner-dependency-check/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    depCheckParser.ts
+    git.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-gitleaks` — 12 files
+
+```
+horizonvigil-scanner-gitleaks/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    git.ts
+    gitleaksParser.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-grype` — 12 files
+
+```
+horizonvigil-scanner-grype/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    git.ts
+    grypeParser.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-kube-bench` — 1 files
+
+```
+horizonvigil-scanner-kube-bench/
+  README.md
+```
+
+## `horizonvigil-scanner-kubescape` — 1 files
+
+```
+horizonvigil-scanner-kubescape/
+  README.md
+```
+
+## `horizonvigil-scanner-nuclei` — 12 files
+
+```
+horizonvigil-scanner-nuclei/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    nucleiParser.ts
+    safeTarget.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-prowler` — 12 files
+
+```
+horizonvigil-scanner-prowler/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    awsCredentials.ts
+    cloudRunJobs.ts
+    ocsfParser.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-semgrep` — 12 files
+
+```
+horizonvigil-scanner-semgrep/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    git.ts
+    semgrepParser.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-shared-lib` — 19 files
+
+```
+horizonvigil-scanner-shared-lib/
+  .gitignore
+  README.md
+  package-lock.json
+  package.json
+  schema/
+    001_init.sql
+    002_grants.sql
+    003_sync_reader_role.sql
+  src/
+    app.ts
+    auth.ts
+    db.ts
+    fingerprint.ts
+    index.ts
+    secretManager.ts
+    secrets.ts
+    severity.ts
+    storage.ts
+    types.ts
+  tsconfig.build.json
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-syft` — 11 files
+
+```
+horizonvigil-scanner-syft/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    git.ts
+    server.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-trivy` — 12 files
+
+```
+horizonvigil-scanner-trivy/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    git.ts
+    server.ts
+    trivyParser.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-scanner-trufflehog` — 11 files
+
+```
+horizonvigil-scanner-trufflehog/
+  .gitignore
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    cloudRunJobs.ts
+    server.ts
+    trufflehogParser.ts
+    worker.ts
+  tsconfig.json
+```
+
+## `horizonvigil-security` — 37 files
+
+```
+horizonvigil-security/
+  .github/
+    workflows/
+      deploy.yml
+      security-checks.yml
+  .gitignore
+  .gitleaks.toml
+  Dockerfile
+  README.md
+  cloudbuild.yaml
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      capabilities.ts
+      complianceCatalog.test.ts
+      complianceCatalog.ts
+      credentialRisk.test.ts
+      credentialRisk.ts
+      evaluateCompliance.ts
+      findings-query.ts
+      postureChecks.test.ts
+      postureChecks.ts
+      scannerClient.ts
+      securityGroupExposure.test.ts
+      securityGroupExposure.ts
+      sourceStatus.test.ts
+      sourceStatus.ts
+    routes/
+      attackPaths.ts
+      cloudCompliance.ts
+      compliance.ts
+      complianceScope.test.ts
+      dashboard.ts
+      findings.ts
+      internalSync.ts
+      posture.ts
+      scanners.ts
+      sources.ts
+    server.ts
+  tsconfig.json
+```
+
+## `horizonvigil-shared-lib` — 44 files
+
+```
+horizonvigil-shared-lib/
+  .github/
+    workflows/
+      build.yml
+  .gitignore
+  README.md
+  package-lock.json
+  package.json
+  src/
+    abac.ts
+    app.ts
+    audit.test.ts
+    audit.ts
+    auth.test.ts
+    auth.ts
+    availability.test.ts
+    availability.ts
+    billing.test.ts
+    billing.ts
+    concurrency.test.ts
+    concurrency.ts
+    connections.test.ts
+    connections.ts
+    cursor.test.ts
+    cursor.ts
+    db.ts
+    env.ts
+    fetchTimeout.test.ts
+    fetchTimeout.ts
+    http.test.ts
+    http.ts
+    idempotency.test.ts
+    idempotency.ts
+    index.ts
+    jobs.test.ts
+    jobs.ts
+    openapi.test.ts
+    openapi.ts
+    pagination.test.ts
+    pagination.ts
+    problem.test.ts
+    problem.ts
+    rateLimit.ts
+    rbac.test.ts
+    rbac.ts
+  tsconfig.build.json
+  tsconfig.json
+  vitest.config.ts
+```
+
+## `horizonvigil-trivy` — 14 files
+
+```
+horizonvigil-trivy/
+  .gcloudignore
+  .gitignore
+  Dockerfile
+  package-lock.json
+  package.json
+  src/
+    env.ts
+    index.ts
+    lib/
+      normalize.ts
+      registryAuth.ts
+      trivy.ts
+    routes/
+      capabilities.ts
+      scan.ts
+    server.ts
+  tsconfig.json
+```
+
+## `supabase` — 157 files
+
+```
+supabase/
+  .gitattributes
+  .github/
+    workflows/
+      schema-drift.yml
+  README.md
+  RECOVER_MISSING_MIGRATIONS.md
+  RESTORE_RUNBOOK.md
+  backup/
+    Dockerfile
+    README.md
+    backup.sh
+  migrations/
+    20260718094237_001_init.sql
+    20260718094352_002_resource_catalog.sql
+    20260718115509_003_fix_role_grants_recursion.sql
+    20260718115601_004_lock_down_security_definer_functions.sql
+    20260718115633_005_revoke_public_execute_on_definer_functions.sql
+    20260718121208_006_restore_execute_grant_emergency.sql
+    20260718121816_007_fix_organizations_returning_visibility.sql
+    20260718172735_add_scan_regions.sql
+    20260719073609_expand_default_scan_regions.sql
+    20260719101258_add_resource_metrics.sql
+    20260724151159_add_resource_costs_cur.sql
+    20260727120621_add_report_generation_columns.sql
+    20260727192719_vulnerability_findings_ingestion.sql
+    20260728050523_cost_recommendations_external_key.sql
+    20260728053514_domain_service_tables.sql
+    20260728053820_profile_favorites.sql
+    20260729040605_aws_accounts_validation.sql
+    20260731113151_cost_anomalies_dedupe_index.sql
+    20260731113831_remediation_requests.sql
+    20260731120017_add_savings_report_category.sql
+    20260731120715_webhooks_platform_and_integrations_secret.sql
+    20260801112143_020_gcp_support.sql
+    20260804052648_gcp_phase2_batch1.sql
+    20260804165037_vuln_findings_dedupe_full_index.sql
+    20260804193313_remediation_action_types.sql
+    20260805022117_024_cost_recommendation_exclusions.sql
+    20260805030632_025_cost_recommendation_notify_owner.sql
+    20260805050634_026_git_installations.sql
+    20260805054048_027_remediation_provider.sql
+    20260806075135_gcp_cloudrun_artifactregistry.sql
+    20260806083626_gcp_artifact_registry_image.sql
+    20260806084633_gcp_gke_workloads.sql
+    20260806085504_eks_workloads.sql
+    20260806115326_rate_limit_buckets.sql
+    20260807070610_033_billing_schema.sql
+    20260807070644_034_idempotency_keys.sql
+    20260807070714_035_security_lint_fixes.sql
+    20260807071138_036_rls_initplan_and_fk_indexes.sql
+    20260807100637_037_webhook_event_idempotency.sql
+    20260807130833_038_eks_namespaces.sql
+    20260807135220_039_eks_nodes.sql
+    20260807181648_040_dashboard_k8s_widgets.sql
+    20260807183819_041_gcp_iam_network.sql
+    20260807184644_042_vulnerability_findings_multicloud.sql
+    20260807185949_043_scheduled_scanning.sql
+    20260811030655_resource_grants.sql
+    20260812133422_enable_daily_auto_scan_all_connections.sql
+    20260812165852_phase1_quickwin_scanners_live.sql
+    20260812170808_restore_false_vanish_deletes.sql
+    20260812171614_restore_gcp_auth_failure_false_vanish.sql
+    20260812174841_scope_auto_scan_to_kamal_org_only.sql
+    20260812175642_phase2_security_governance_scanners_live.sql
+    20260813024214_phase3_storage_database_networking_scanners_live.sql
+    20260813154825_phase4_compute_devtools_scanners_live.sql
+    20260818030004_harden_security_definer_functions_and_add_missing_rls.sql
+    20260818030030_consolidate_rls_policies_menu_permissions_resource_grants.sql
+    20260818030207_fix_security_definer_grants_revoke_explicit_role_grants.sql
+    20260818030501_cleanup_orphaned_test_organizations.sql
+    20260818125651_pending_invites_add_token_and_expiry.sql
+    20260818131339_webhook_processing_failures.sql
+    20260818145352_admin_issue_resolution_columns.sql
+    20260818203834_add_azure_provider_support.sql
+    20260818221026_widen_resource_type_catalog_provider_check.sql
+    20260818221045_seed_azure_resource_type_catalog.sql
+    20260819042603_add_azure_subscription_unique_index.sql
+    20260819161418_add_incidents_and_incident_events.sql
+    20260819161620_add_rls_to_incidents_tables.sql
+    20260819165212_add_monitoring_alarms_unique_index.sql
+    20260819170657_add_deployment_events.sql
+    20260819171750_add_verification_runs.sql
+    20260819180802_add_incident_number.sql
+    20260819184119_webhooks_encrypted_secret.sql
+    20260820071117_add_failed_steps_to_validation_runs.sql
+    20260820100318_add_azure_auth_type.sql
+    20260820113016_add_vulnerability_dashboard_aggregation_rpcs.sql
+    20260820134405_add_atomic_coupon_redemption.sql
+    20260820153353_revoke_public_execute_on_new_definer_functions.sql
+    20260820153421_revoke_public_grant_on_new_definer_functions.sql
+    20260820153528_self_enforce_tenant_scope_on_vulnerability_rpcs.sql
+    20260821105757_add_next_permission_check_at.sql
+    20260821111732_add_attack_path_findings_rpc.sql
+    20260821111750_revoke_anon_execute_on_attack_path_findings.sql
+    20260821113750_add_iam_access_analyzer_unused_finding_source.sql
+    20260824195709_add_cloud_identities.sql
+    20260825032526_add_cloud_resource_edges.sql
+    20260825032642_fix_cloud_resource_edges_conflict_target.sql
+    20260825050514_attack_path_findings_use_edge_table.sql
+    20260825052344_add_abac.sql
+    20260825054634_add_scim.sql
+    20260825104919_add_scan_started_at.sql
+    20260826195115_attack_path_findings_widen_exposure.sql
+    20260827032127_add_escalation_policy_to_alert_rules.sql
+    20260828162619_phase5_cost_explorer_budgets_inspector2_live.sql
+    20260828164826_phase6_analytics_networking_security_governance_scanners_live.sql
+    20260905090932_add_budget_last_alert_key.sql
+    20260905090943_add_gcp_billing_export_columns.sql
+    20260905152639_vulnerability_findings_unify_scanner_platform.sql
+    20260905152702_update_vulnerability_dashboard_rpcs_for_org_scoped_findings.sql
+    20260905152717_add_sync_cursors.sql
+    20260905152758_harden_vulnerability_context_functions_search_path.sql
+    20260905161756_fix_scanner_finding_id_dedupe_index_for_on_conflict.sql
+    20260906142714_add_cost_recommendation_source_tracking.sql
+    20260906143912_widen_cost_recommendations_resource_dedupe.sql
+    20260906192202_add_cost_sync_scheduling.sql
+    20260908003604_cloud_resources_breakdown_rpc.sql
+    20260908003641_revoke_anon_on_cloud_resources_breakdown.sql
+    20260908041443_revoke_anon_on_vulnerability_dashboard_org_scoped_rpcs.sql
+    20260908103813_fix_stale_cloudops360_branding_in_billing_addons.sql
+    20260909021441_collection_runs_durable_jobs.sql
+    20260909024207_capability_status_and_credential_versions.sql
+    20260909030555_credential_versions_retain_blob_for_rollback.sql
+    20260909031333_resource_entity_class.sql
+    20260909031436_cloud_resources_breakdown_entity_class_v2.sql
+    20260909032205_collection_runs_checkpoint_data.sql
+    20260909034001_ownership_application_iac_mapping.sql
+    20260909044401_recommendation_evidence_contract.sql
+    20260909051455_evaluate_open_cost_recommendations_2026_09_09.sql
+    20260909052513_compliance_control_evidence_model.sql
+    20260909092208_report_snapshot_manifest.sql
+    20260909105915_idempotency_request_fingerprint.sql
+    20260909172412_audit_log_hash_chain.sql
+    20260909172434_audit_log_hash_chain_backfill.sql
+    20260909172511_audit_log_chain_verification.sql
+    20260910025734_audit_log_append_only_and_revoke_truncate.sql
+    20260910040252_lineage_and_quarantine.sql
+    20260910171615_cost_facts_and_billing_periods.sql
+    20260911104443_cost_reconciliation.sql
+    20260911104452_add_aws_org_external_id.sql
+    20260911110041_phase4_canonical_resource_generations_and_lifecycle.sql
+    20260911110132_phase4_provider_region_catalog.sql
+    20260911112134_phase4_drop_pre_generation_resource_identity_constraint.sql
+    20260915043521_aws05_per_connection_region_opt_in.sql
+    20260915045317_multicloud_canonical_resource_type.sql
+    20260915070111_breakdown_rpc_exposes_canonical_type.sql
+    20260915074931_aws11_inventory_reconciliations.sql
+    20260915081618_edge_vocabulary_attached_to_protected_by.sql
+    20260915103000_atomic_aws_credential_rotation.sql
+    20260916040458_canonical_type_cross_cloud_coverage.sql
+    20260916041500_revoke_anon_on_credential_rotation_rpcs.sql
+    20260922011500_aws08_classify_remaining_observed_aws_types.sql
+    20260922084500_capability_state_service_unavailable_unknown.sql
+    20260922090000_collection_run_degraded_reasons.sql
+    20260922094500_revoke_public_execute_on_internal_functions.sql
+    20260922160000_close_credential_rotation_rpc_escalation.sql
+  scripts/
+    check-schema-drift.sh
+  tests/
+    audit_chain_tamper.sql
+    cost_facts_invariants.sql
+    lineage_dedupe.sql
+    resource_generations.sql
+```
+
