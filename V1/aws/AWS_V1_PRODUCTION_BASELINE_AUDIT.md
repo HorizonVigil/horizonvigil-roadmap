@@ -371,6 +371,86 @@ check first. **Owner action: confirm whether Amazon Inspector is activated in
 604179600483 and 354307071074.** If it is activated and this persists, there
 is a permissions boundary or similar constraint on the IAM user worth finding.
 
+### I1 / I3 — 2026-09-23
+
+**I3 (credential-rollback privilege escalation): CLOSED and verified.**
+
+The RPCs were raised to match the API, not the other way round. Both
+`rollback_aws_access_key` and `rotate_aws_access_key` now require the same
+effective `cloud` menu level the route requires, on top of the membership
+check they already had.
+
+Direct-RPC matrix, run as each real user via `request.jwt.claims` inside a
+rolled-back transaction, 2026-09-23:
+
+| caller | cloud override | result |
+|---|---|---|
+| viewer | - | **DENIED (42501)** |
+| billing_admin | - | **DENIED (42501)** |
+| editor | - | ALLOWED |
+| admin | - | ALLOWED |
+| owner | - | ALLOWED |
+| viewer | read | **DENIED (42501)** |
+| viewer | write | ALLOWED |
+| billing_admin | admin | ALLOWED |
+
+Non-member and unauthenticated callers are also denied 42501, and
+`rotate_aws_access_key` behaves identically — the sibling is not a way around.
+
+Alternate-path sweep: of every SECURITY DEFINER function callable by
+`authenticated`, exactly TWO mutate credentials, and both carry the RBAC
+check. None are callable by `anon`. All have a pinned `search_path`.
+
+Also fixed while verifying: the rollback route had **no rate limit**, while
+rotation did. This audit described the API as enforcing one here; it did not.
+Rollback swaps the live credential, so it now shares rotation's budget.
+
+Audit chain: 0 breaks. (A previous check in this file reporting breaks was a
+query error — the chain is keyed PER ORG; 7 orgs, 7 origins, `(org_id, seq)`
+unique, 0 breaks.)
+
+**I1 (IAM policy drift): NOT closed.**
+
+The intended least-privilege policy has NOT been applied. `AdministratorAccess`
+was attached instead, which the finding explicitly excludes.
+
+A claim in this file's previous revision was wrong and is corrected here: it
+said the admin grant cleared all seven drifted services. It did not. Six of the
+seven were **not probed by permission validation at all** — only securityhub
+was — so they vanished from the denied list because they were never in it.
+Absence was read as success.
+
+Six probes have been added, each calling the SAME endpoint its scanner calls,
+so the finding is now verifiable by the product. Result against the live
+accounts, 2026-09-23 09:13, both connections identical:
+
+| service | status |
+|---|---|
+| lambda | **granted** |
+| kafka | denied |
+| imagebuilder | denied |
+| macie2 | denied |
+| fms | denied |
+| license-manager | denied |
+| securityhub | not_applicable — not enabled in this region |
+
+Lambda granted is the load-bearing datum: it proves AdministratorAccess IS in
+effect on these credentials. Under a policy allowing `*:*` a denial cannot be a
+policy gap, so the remaining five are almost certainly services never activated
+in these accounts — the same AccessDenied-on-inactive behaviour Inspector has.
+Their messages now name both causes, cheaper check first.
+
+**To close I1**, run `V1/aws/iam/apply-collection-policy.sh` in each account.
+It attaches `horizonvigil-collection-policy.json` (14 statements, 173 actions,
+zero credential-producing, zero mutating — verified) and then detaches
+AdministratorAccess, in that order. The IAM principal is `user/Kamal` in both
+accounts, per STS. HorizonVigil cannot run it: the connector holds no AWS
+identity of its own, and using the customer's stored credentials to rewrite
+IAM would breach the collection-role boundary the policy exists to enforce.
+
+After applying, re-run validation and discovery: lambda must stay granted, and
+the five others must move to granted or to an honest not-applicable.
+
 ### Found BY the new alerting, within minutes of it existing
 
 **`scheduled-scan-gcp` has been failing since 2026-09-11 - 12 consecutive
