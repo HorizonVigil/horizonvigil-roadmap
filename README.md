@@ -2,6 +2,10 @@
 
 What is being built, in what order, and what counts as done.
 
+Start with the **[Product and Engineering Handbook](docs/README.md)** for the
+PRD, architecture, V1 → V2 → V3 issue sequence, security engineering,
+testing/certification, design system, code standards, and agent instructions.
+
 This repository holds **no code**. It is the plan of record for the real
 deployed system: a multi-cloud posture and cost platform built on React/Vite,
 TypeScript/Hono services on GCP Cloud Run, and Supabase/Postgres.
@@ -24,17 +28,18 @@ None of those were visible from reading code or from a green pipeline. So
 this repository records not just the plan but **the evidence standard**: see
 [CONVENTIONS.md](CONVENTIONS.md).
 
-## The two tracks
+## Product versions
 
-| track | scope | state |
+| version | scope | state |
 |---|---|---|
-| **[V1](V1/)** | **Multi-cloud** (AWS, Azure, GCP, OCI). Inventory, cost truth, posture, compliance, identity, ownership, recommendations, reports. 27 phases. | Active — **NO-GO** |
-| **[V2](V2/)** | Vulnerability management, provider remediation, scheduled delivery. **Built or partially built, deliberately switched off.** | Gated |
+| **V1** | Cloud and FinOps: AWS first, then Azure and GCP; inventory, cost, security, compliance, changes, AI intelligence, governance and Admin Console. GitHub Phases 00–11. | Active — **NO-GO until certification** |
+| **V2** | Observability: metrics, logs, traces, APM, RUM, synthetics, profiling, service maps, alerting, SLOs and incidents. GitHub Phases 12–16. | Planned |
+| **V3** | Vulnerability management: CNAPP, CSPM, CWPP, CIEM, DSPM, KSPM, SAST, SCA, SBOM, DAST, IaC, secrets, containers, remediation and reporting. GitHub Phases 17–20. | Planned |
 
-V2 is not a backlog of unstarted ideas. Much of it exists in the codebase and
-is **fail-closed disabled** behind feature flags, with server-side denial —
-not merely hidden in the UI. See [V2/README.md](V2/README.md) for why, and
-for how each gate is enforced.
+The older `V1/` and `V2/` evidence directories contain historical implementation
+audits and must not override the current GitHub Phase 00–20 release model. Built
+or partially built features may remain fail-closed behind server-side gates until
+their current certification phase passes.
 
 ## Navigating
 
