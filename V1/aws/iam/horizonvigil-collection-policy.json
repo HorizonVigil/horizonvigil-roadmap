@@ -235,7 +235,9 @@
         "cur:Describe*",
         "account:GetAccountInformation",
         "account:ListRegions",
-        "savingsplans:Describe*"
+        "savingsplans:Describe*",
+        "bcm-data-exports:ListExports",
+        "bcm-data-exports:GetExport"
       ],
       "Resource": "*"
     },
@@ -276,6 +278,18 @@
         "license-manager:List*"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "CostAndUsageReportObjectRead",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::horizonvigil-cur-*",
+        "arn:aws:s3:::horizonvigil-cur-*/*"
+      ]
     }
   ]
 }
