@@ -11,6 +11,7 @@ This directory is the documentation entry point for building HorizonVigil in a c
 5. [Testing and certification](04-testing/TESTING-AND-CERTIFICATION.md)
 6. [Design system](05-design/DESIGN-SYSTEM.md)
 7. [Code standards](06-engineering/CODE-STANDARDS.md)
+8. [Production owner action and test runbook](07-operations/PRODUCTION-OWNER-ACTION-RUNBOOK.md)
 
 Version scopes: [V1](versions/V1-CLOUD-FINOPS.md), [V2](versions/V2-OBSERVABILITY.md), [V3](versions/V3-VULNERABILITY-MANAGEMENT.md), and [Admin Console](versions/ADMIN-CONSOLE.md).
 
